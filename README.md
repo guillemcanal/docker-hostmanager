@@ -1,5 +1,7 @@
 # [WIP] Docker HostManager
 
+[![Build Status](https://travis-ci.org/guillemcanal/docker-hostmanager.svg?branch=master)](https://travis-ci.org/guillemcanal/docker-hostmanager)
+
 A Docker event listener that manage the `hosts` file on your host machine.
 
 ## Todo
