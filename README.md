@@ -6,7 +6,7 @@ A Docker event listener that manage the `hosts` file on your host machine.
 
 ## Todo
 
-- [ ] Create a configurable command run the Docker events listener
+- [ ] Create a configurable command that run the Docker events listener
 - [x] Create a listener that listen to Docker container events
 - [x] Create an hosts provider that use Traefik labels
 - [x] Create an hosts file manager that manage the state of the `hosts` file
