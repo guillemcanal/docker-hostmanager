@@ -1,5 +1,14 @@
-language: php
+dist: trusty
 sudo: false
+language: php
 php: 7.2
+
+addons:
+  sonarcloud:
+    organization: "guillemcanal-github"
+
 install: composer install
-script: vendor/bin/phpunit --testdox --coverage-text
+
+script: 
+  - vendor/bin/phpunit --testdox --log-junit build/phpunit.xml --coverage-clover build/phpunit.coverage.xml --coverage-text
+  - sonar-scanner
