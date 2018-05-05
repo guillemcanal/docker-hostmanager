@@ -9,36 +9,36 @@ class HostsFileManager
     private const HOSTS_FILE_FENCED_BLOCK_REGEX = '/#<docker-stack>\n(.+?)?(?=#<\/docker-stack>)/s';
 
     /** @var string */
-    private $ipAddress;
+    private $hostIpAddress;
 
     /** @var FileHandler */
     private $hostsFile;
 
     /** @var string[] */
-    private $domains = [];
+    private $hostnames = [];
 
     /**
      * @throws \UnexpectedValueException When the hosts file does not exists
      */
-    public function __construct(FileHandler $hostsFile, string $ipAdress = '127.0.0.1')
+    public function __construct(FileHandler $hostsFile, string $hostIpAddress = '127.0.0.1')
     {
         $this->hostsFile = $hostsFile;
-        $this->ipAddress = $ipAdress;
+        $this->hostIpAddress = $hostIpAddress;
         if (!$this->hostsFile->exists()) {
             throw new \UnexpectedValueException('The hosts file could not be found');
         }
-        if (!$this->hostsFileContainsFencedBlock()) {
-            $this->addHostsFileFencedBlock();
+        if (!$this->hostsFileContainsDockerStackFencedBlock()) {
+            $this->addDockerStackFencedBlock();
         }
         $this->parseHostsFile();
     }
 
-    private function hostsFileContainsFencedBlock(): bool
+    private function hostsFileContainsDockerStackFencedBlock(): bool
     {
         return preg_match(self::HOSTS_FILE_FENCED_BLOCK_REGEX, $this->hostsFile->getContents()) === 1;
     }
 
-    private function addHostsFileFencedBlock(): void
+    private function addDockerStackFencedBlock(): void
     {
         $this->hostsFile->putContents(
             $this->hostsFile->getContents()
@@ -46,22 +46,22 @@ class HostsFileManager
         );
     }
 
-    public function hasDomain(string $domain): bool
+    public function hasHostname(string $hostname): bool
     {
-        return \in_array($domain, $this->domains, true);
+        return \in_array($hostname, $this->hostnames, true);
     }
 
-    public function addDomain(string $domain): void
+    public function addHostname(string $hostname): void
     {
-        if (!$this->hasDomain($domain)) {
-            $this->domains[] = $domain;
+        if (!$this->hasHostname($hostname)) {
+            $this->hostnames[] = $hostname;
         }
     }
 
-    public function removeDomain(string $domain): void
+    public function removeHostname(string $hostname): void
     {
-        if ($this->hasDomain($domain)) {
-            unset($this->domains[array_search($domain, $this->domains, true)]);
+        if ($this->hasHostname($hostname)) {
+            unset($this->hostnames[array_search($hostname, $this->hostnames, true)]);
         }
     }
 
@@ -71,9 +71,9 @@ class HostsFileManager
             "\n",
                 array_map(
                 function (string $domain) {
-                    return $this->ipAddress . ' ' . $domain;
+                    return $this->hostIpAddress . ' ' . $domain;
                 },
-                $this->domains
+                $this->hostnames
             )
         );
 
@@ -104,9 +104,9 @@ class HostsFileManager
             }
             $matched = preg_split('/\s+/', $rawDomain);
             if (\count($matched) !== 2) {
-                throw new \RuntimeException('Expected exactly one IP address and one domain, got ' . $rawDomain);
+                throw new \RuntimeException('Expected exactly one IP address and one hostname, got ' . $rawDomain);
             }
-            $this->addDomain($matched[1]);
+            $this->addHostname($matched[1]);
         }
     }
 }

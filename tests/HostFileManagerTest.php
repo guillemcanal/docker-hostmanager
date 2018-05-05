@@ -11,11 +11,11 @@ class HostFileManagerTest extends TestCase
     public function it throw an exception when the hosts file cannot be found()
     {
         $this->expectException(\UnexpectedValueException::class);
-        new HostsFileManager(new InMemoryFile('', $souldExists = false));
+        new HostsFileManager(new InMemoryFile('', $shouldExists = false));
     }
 
     /** @test */
-    public function it should create a docker stack fenced block if not present in the hosts file()
+    public function it should create a docker stack fenced block if not present in a hosts file()
     {
         $contents = '127.0.0.1 localhost localdomain';
         $hostsFile = new InMemoryFile($contents);
@@ -26,7 +26,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it extract hosts from the docker stack fenced block()
+    public function it can extract hostnames from a docker stack fenced block()
     {
         $contents = implode("\n",
             [
@@ -40,40 +40,12 @@ class HostFileManagerTest extends TestCase
 
         $hostFileManager = new HostsFileManager(new InMemoryFile($contents));
 
-        assertTrue($hostFileManager->hasDomain('dev.foo.fr'));
-        assertTrue($hostFileManager->hasDomain('dev.bar.fr'));
+        assertTrue($hostFileManager->hasHostname('dev.foo.fr'));
+        assertTrue($hostFileManager->hasHostname('dev.bar.fr'));
     }
 
     /** @test */
-    public function it can add an host in the docker stack fenced block()
-    {
-        $actualContent = implode("\n",
-            [
-                '127.0.0.1 localhost',
-            ]
-        );
-        $expectedContent = implode("\n",
-            [
-                '127.0.0.1 localhost',
-                '#<docker-stack>',
-                '127.0.0.1 dev.bat.fr',
-                '#</docker-stack>',
-                ''
-            ]
-        );
-
-        $hostsFile = new InMemoryFile($actualContent);
-
-        $hostsFileManager = new HostsFileManager($hostsFile);
-        $hostsFileManager->addDomain('dev.bat.fr');
-        $hostsFileManager->updateHostsFile();
-
-        assertTrue($hostsFileManager->hasDomain('dev.bat.fr'));
-        assertThat($hostsFile->getContents(), equalTo($expectedContent));
-    }
-
-    /** @test */
-    public function it can append an host in an existing docker stack fenced block()
+    public function it can add a hostname in an existing docker stack fenced block()
     {
         $actualContent = implode("\n",
             [
@@ -98,15 +70,15 @@ class HostFileManagerTest extends TestCase
         $hostsFile = new InMemoryFile($actualContent);
 
         $hostsFileManager = new HostsFileManager($hostsFile);
-        $hostsFileManager->addDomain('dev.baz.fr');
+        $hostsFileManager->addHostname('dev.baz.fr');
         $hostsFileManager->updateHostsFile();
 
-        assertTrue($hostsFileManager->hasDomain('dev.baz.fr'));
+        assertTrue($hostsFileManager->hasHostname('dev.baz.fr'));
         assertThat($hostsFile->getContents(), equalTo($expectedContent));
     }
 
     /** @test */
-    public function it can remove an host in an existing docker stack fenced block()
+    public function it can remove a hostname in an existing docker stack fenced block()
     {
         $actualContent = implode("\n",
             [
@@ -129,18 +101,18 @@ class HostFileManagerTest extends TestCase
         $hostsFile = new InMemoryFile($actualContent);
 
         $hostsFileManager = new HostsFileManager($hostsFile);
-        $hostsFileManager->removeDomain('dev.bar.fr');
+        $hostsFileManager->removeHostname('dev.bar.fr');
         $hostsFileManager->updateHostsFile();
 
-        assertFalse($hostsFileManager->hasDomain('dev.baz.fr'));
+        assertFalse($hostsFileManager->hasHostname('dev.baz.fr'));
         assertThat($hostsFile->getContents(), equalTo($expectedContent));
     }
 
     /** @test */
-    public function it throw an exception when it cant extract exactly one ip address and an host()
+    public function it throw an exception when it cant extract exactly one ip address and one hostname()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Expected exactly one IP address and one domain, got oups');
+        $this->expectExceptionMessage('Expected exactly one IP address and one hostname, got oups');
 
         $content = implode("\n",
             [

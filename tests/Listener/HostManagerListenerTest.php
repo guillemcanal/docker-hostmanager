@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 class HostManagerListenerTest extends TestCase
 {
     /** @test */
-    public function it support docker containers create events()
+    public function it supports docker container create events()
     {
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
         $hostsProviderMock = $this->prophesize(HostsProvider::class);
@@ -29,7 +29,7 @@ class HostManagerListenerTest extends TestCase
     }
 
     /** @test */
-    public function it support docker containers destroy events()
+    public function it supports docker container destroy events()
     {
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
         $hostsProviderMock = $this->prophesize(HostsProvider::class);
@@ -47,7 +47,7 @@ class HostManagerListenerTest extends TestCase
     }
 
     /** @test */
-    public function it handle containers create events by adding hosts in the hosts file()
+    public function it handle container create events by adding hostnames in the hosts file()
     {
         $actor = new EventsGetResponse200Actor();
         $actor->setAttributes($attributes = new \ArrayObject());
@@ -61,8 +61,8 @@ class HostManagerListenerTest extends TestCase
         $hostsProviderMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
 
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsFileManagerMock->addDomain('foo.fr')->shouldBeCalledTimes(1);
-        $hostsFileManagerMock->addDomain('bar.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->addHostname('foo.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->addHostname('bar.fr')->shouldBeCalledTimes(1);
         $hostsFileManagerMock->updateHostsFile()->shouldBeCalledTimes(1);
 
         $listener = new HostManagerListener(
@@ -74,7 +74,7 @@ class HostManagerListenerTest extends TestCase
     }
 
     /** @test */
-    public function it handle containers destroy events by removing hosts in the hosts file()
+    public function it handle container destroy events by removing hostnames in the hosts file()
     {
         $actor = new EventsGetResponse200Actor();
         $actor->setAttributes($attributes = new \ArrayObject());
@@ -88,8 +88,8 @@ class HostManagerListenerTest extends TestCase
         $hostsProviderMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
 
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsFileManagerMock->removeDomain('foo.fr')->shouldBeCalledTimes(1);
-        $hostsFileManagerMock->removeDomain('bar.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->removeHostname('foo.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->removeHostname('bar.fr')->shouldBeCalledTimes(1);
         $hostsFileManagerMock->updateHostsFile()->shouldBeCalledTimes(1);
 
         $listener = new HostManagerListener(

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class InMemoryFileTest extends TestCase
 {
     /** @test */
-    public function it provide the content for a file()
+    public function it provide the content of a file()
     {
         $file = new InMemoryFile('some content');
 
@@ -42,7 +42,7 @@ class InMemoryFileTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to get the content of the file which dont exist()
+    public function it throw an exception when trying to get the content of the file which do not exist()
     {
         $this->expectException(FileDoesNotExist::class);
 
@@ -51,7 +51,7 @@ class InMemoryFileTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to update the content of the file which dont exist()
+    public function it throw an exception when trying to update the content of the file which do not exist()
     {
         $this->expectException(FileDoesNotExist::class);
 
@@ -60,7 +60,7 @@ class InMemoryFileTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to update the content of the file which is not writable()
+    public function it throw an exception when trying to update the content of a file which is not writable()
     {
         $this->expectException(FileNotWritable::class);
 

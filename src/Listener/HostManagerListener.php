@@ -43,14 +43,14 @@ class HostManagerListener implements DockerEventListener
     private function addHosts(array $hosts): void
     {
         foreach ($hosts as $host) {
-            $this->hostsFileManager->addDomain($host);
+            $this->hostsFileManager->addHostname($host);
         }
     }
 
     private function removeHosts(array $hosts): void
     {
         foreach ($hosts as $host) {
-            $this->hostsFileManager->removeDomain($host);
+            $this->hostsFileManager->removeHostname($host);
         }
     }
 }

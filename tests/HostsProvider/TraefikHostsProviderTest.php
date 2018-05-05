@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 class TraefikHostsProviderTest extends TestCase
 {
     /** @test */
-    public function it should extract hosts from a traefik label()
+    public function it should extract hostnames from a traefik frontend rule label()
     {
         $containerAttributes = new \ArrayObject(
             ['traefik.frontend.rule' => 'Host:dev.foo.fr,dev.bar.fr,dev.baz.fr; Path:/hello']
@@ -24,7 +24,7 @@ class TraefikHostsProviderTest extends TestCase
     }
 
     /** @test */
-    public function it does not provide hosts when the traefik frontend rule label is absent()
+    public function it does not provide hostnamess when the traefik frontend rule label is absent()
     {
         $containerAttributes = new \ArrayObject();
         $traefikHostProvider = new TraefikHostsProvider();
@@ -33,7 +33,7 @@ class TraefikHostsProviderTest extends TestCase
     }
 
     /** @test */
-    public function it does not provide hosts when the traefik frontend rule label does not contains an host rule()
+    public function it does not provide hostnames when the traefik frontend rule label does not contains an host rule()
     {
         $containerAttributes = new \ArrayObject(
             ['traefik.frontend.rule' => 'HostRegexp:{subdomain:[a-z]+}.localhost; Path:/hello']
