@@ -3,6 +3,7 @@ namespace ElevenLabs\DockerHostManager;
 
 use Docker\API\Model\EventsGetResponse200;
 use Docker\Docker;
+use Docker\Stream\EventStream;
 use ElevenLabs\DockerHostManager\Listener\DockerEventListener;
 
 class DockerEvents
@@ -25,6 +26,7 @@ class DockerEvents
 
     public function run()
     {
+        /** @var EventStream $events */
         $events = $this->docker->systemEvents();
         $events->onFrame(
             function (EventsGetResponse200 $event) {
