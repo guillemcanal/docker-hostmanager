@@ -1,8 +1,8 @@
 <?php
 
-namespace ElevenLabs\DockerHostManager\HostsProvider;
+namespace ElevenLabs\DockerHostManager\HostsExtractor;
 
-interface HostsProvider
+interface HostsExtractor
 {
     public function hasHosts(\ArrayObject $attributes): bool;
     public function getHosts(\ArrayObject $attributes): array;

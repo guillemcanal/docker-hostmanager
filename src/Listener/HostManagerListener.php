@@ -4,33 +4,42 @@ namespace ElevenLabs\DockerHostManager\Listener;
 
 use Docker\API\Model\EventsGetResponse200;
 use ElevenLabs\DockerHostManager\HostsFileManager;
-use ElevenLabs\DockerHostManager\HostsProvider\HostsProvider;
+use ElevenLabs\DockerHostManager\HostsExtractor\HostsExtractor;
 
 class HostManagerListener implements DockerEventListener
 {
     /** @var HostsFileManager */
     private $hostsFileManager;
-    /** @var HostsProvider */
-    private $hostsProvider;
+    /** @var HostsExtractor[] */
+    private $hostsExtractors = [];
 
-    public function __construct(HostsFileManager $hostsFileManager, HostsProvider $hostsProvider)
+    public function __construct(HostsFileManager $hostsFileManager, array $hostsExtractors)
     {
         $this->hostsFileManager = $hostsFileManager;
-        $this->hostsProvider    = $hostsProvider;
+        foreach ($hostsExtractors as $hostsExtractor) {
+            $this->addHostsExtractor($hostsExtractor);
+        }
+    }
+
+    public function addHostsExtractor(HostsExtractor $hostsExtractor): void
+    {
+        $this->hostsExtractors[] = $hostsExtractor;
     }
 
     public function handle(EventsGetResponse200 $event): void
     {
         $containerAttributes = $event->getActor()->getAttributes();
-        if ($this->hostsProvider->hasHosts($containerAttributes)) {
-            $hosts = $this->hostsProvider->getHosts($containerAttributes);
-            if ($event->getAction() === 'create') {
-                $this->addHosts($hosts);
+        foreach ($this->hostsExtractors as $hostsExtractor) {
+            if ($hostsExtractor->hasHosts($containerAttributes)) {
+                $hosts = $hostsExtractor->getHosts($containerAttributes);
+                if ($event->getAction() === 'create') {
+                    $this->addHosts($hosts);
+                }
+                if ($event->getAction() === 'destroy') {
+                    $this->removeHosts($hosts);
+                }
+                $this->hostsFileManager->updateHostsFile();
             }
-            if ($event->getAction() === 'destroy') {
-                $this->removeHosts($hosts);
-            }
-            $this->hostsFileManager->updateHostsFile();
         }
     }
 

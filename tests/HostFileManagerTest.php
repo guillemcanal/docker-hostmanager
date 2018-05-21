@@ -17,18 +17,31 @@ class HostFileManagerTest extends TestCase
     /** @test */
     public function it should create a docker stack fenced block if not present in a hosts file()
     {
-        $contents = '127.0.0.1 localhost localdomain';
-        $hostsFile = new InMemoryFile($contents);
+        $actualContent = implode("\n",
+            [
+                '127.0.0.1 localhost localdomain',
+            ]
+        );
+        $expectedContent = implode("\n",
+            [
+                '127.0.0.1 localhost localdomain',
+                '#<docker-stack>',
+                '#</docker-stack>',
+                ''
+            ]
+        );
+
+        $hostsFile = new InMemoryFile($actualContent);
 
         new HostsFileManager($hostsFile);
 
-        assertThat($hostsFile->getContents(), stringContains("#<docker-stack>\n#</docker-stack>"));
+        assertThat($hostsFile->getContents(), equalTo($expectedContent));
     }
 
     /** @test */
     public function it can extract hostnames from a docker stack fenced block()
     {
-        $contents = implode("\n",
+        $actualContent = implode("\n",
             [
                 '127.0.0.1 localhost localdomain',
                 '#<docker-stack>',
@@ -38,7 +51,7 @@ class HostFileManagerTest extends TestCase
             ]
         );
 
-        $hostFileManager = new HostsFileManager(new InMemoryFile($contents));
+        $hostFileManager = new HostsFileManager(new InMemoryFile($actualContent));
 
         assertTrue($hostFileManager->hasHostname('dev.foo.fr'));
         assertTrue($hostFileManager->hasHostname('dev.bar.fr'));
@@ -114,7 +127,7 @@ class HostFileManagerTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Expected exactly one IP address and one hostname, got oups');
 
-        $content = implode("\n",
+        $actualContent = implode("\n",
             [
                 '127.0.0.1 localhost localdomain',
                 '#<docker-stack>',
@@ -123,6 +136,36 @@ class HostFileManagerTest extends TestCase
             ]
         );
 
-        new HostsFileManager(new InMemoryFile($content));
+        new HostsFileManager(new InMemoryFile($actualContent));
+    }
+
+    /** @test */
+    public function it can clear hostnames managed by the docker stack()
+    {
+        $actualContent = implode("\n",
+            [
+                '127.0.0.1 localhost localdomain',
+                '#<docker-stack>',
+                '127.0.0.1 dev.foo.fr',
+                '127.0.0.1 dev.bar.fr',
+                '#</docker-stack>',
+                '192.168.1.1 helloworld',
+            ]
+        );
+
+        $expectedContent = implode("\n",
+            [
+                '127.0.0.1 localhost localdomain',
+                '#<docker-stack>',
+                '#</docker-stack>',
+                '192.168.1.1 helloworld',
+            ]
+        );
+
+        $file = new InMemoryFile($actualContent);
+        $hostsFileManager = new HostsFileManager($file);
+        $hostsFileManager->clear();
+
+        assertThat($file->getContents(), equalTo($expectedContent));
     }
 }

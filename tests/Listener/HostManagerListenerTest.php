@@ -5,7 +5,7 @@ namespace ElevenLabs\DockerHostManager\Listener;
 use Docker\API\Model\EventsGetResponse200;
 use Docker\API\Model\EventsGetResponse200Actor;
 use ElevenLabs\DockerHostManager\HostsFileManager;
-use ElevenLabs\DockerHostManager\HostsProvider\HostsProvider;
+use ElevenLabs\DockerHostManager\HostsExtractor\HostsExtractor;
 use PHPUnit\Framework\TestCase;
 
 class HostManagerListenerTest extends TestCase
@@ -14,11 +14,11 @@ class HostManagerListenerTest extends TestCase
     public function it supports docker container create events()
     {
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsProviderMock = $this->prophesize(HostsProvider::class);
+        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
 
         $listener = new HostManagerListener(
             $hostsFileManagerMock->reveal(),
-            $hostsProviderMock->reveal()
+            [$hostsExtractorMock->reveal()]
         );
 
         $event = $this->prophesize(EventsGetResponse200::class);
@@ -32,11 +32,11 @@ class HostManagerListenerTest extends TestCase
     public function it supports docker container destroy events()
     {
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsProviderMock = $this->prophesize(HostsProvider::class);
+        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
 
         $listener = new HostManagerListener(
             $hostsFileManagerMock->reveal(),
-            $hostsProviderMock->reveal()
+            [$hostsExtractorMock->reveal()]
         );
 
         $event = $this->prophesize(EventsGetResponse200::class);
@@ -56,9 +56,9 @@ class HostManagerListenerTest extends TestCase
         $event->setAction('create');
         $event->setActor($actor);
 
-        $hostsProviderMock = $this->prophesize(HostsProvider::class);
-        $hostsProviderMock->hasHosts($attributes)->willReturn(true);
-        $hostsProviderMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
+        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
+        $hostsExtractorMock->hasHosts($attributes)->willReturn(true);
+        $hostsExtractorMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
 
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
         $hostsFileManagerMock->addHostname('foo.fr')->shouldBeCalledTimes(1);
@@ -67,7 +67,7 @@ class HostManagerListenerTest extends TestCase
 
         $listener = new HostManagerListener(
             $hostsFileManagerMock->reveal(),
-            $hostsProviderMock->reveal()
+            [$hostsExtractorMock->reveal()]
         );
 
         $listener->handle($event);
@@ -83,9 +83,9 @@ class HostManagerListenerTest extends TestCase
         $event->setAction('destroy');
         $event->setActor($actor);
 
-        $hostsProviderMock = $this->prophesize(HostsProvider::class);
-        $hostsProviderMock->hasHosts($attributes)->willReturn(true);
-        $hostsProviderMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
+        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
+        $hostsExtractorMock->hasHosts($attributes)->willReturn(true);
+        $hostsExtractorMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
 
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
         $hostsFileManagerMock->removeHostname('foo.fr')->shouldBeCalledTimes(1);
@@ -94,7 +94,7 @@ class HostManagerListenerTest extends TestCase
 
         $listener = new HostManagerListener(
             $hostsFileManagerMock->reveal(),
-            $hostsProviderMock->reveal()
+            [$hostsExtractorMock->reveal()]
         );
 
         $listener->handle($event);

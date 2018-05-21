@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace ElevenLabs\DockerHostManager\HostsProvider;
+namespace ElevenLabs\DockerHostManager\HostsExtractor;
 
 /**
  * Extract hosts from the `traefik.frontend.rule` Traefik Docker label
  */
-class TraefikHostsProvider implements HostsProvider
+class TraefikFrontendRule implements HostsExtractor
 {
     const HOSTS_ATTRIBUTE_KEY = 'traefik.frontend.rule';
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace ElevenLabs\DockerHostManager\HostsProvider;
+namespace ElevenLabs\DockerHostManager\HostsExtractor;
 
 use PHPUnit\Framework\TestCase;
 
-class TraefikHostsProviderTest extends TestCase
+class TraefikFrontendRuleTest extends TestCase
 {
     /** @test */
     public function it should extract hostnames from a traefik frontend rule label()
@@ -13,10 +13,10 @@ class TraefikHostsProviderTest extends TestCase
             ['traefik.frontend.rule' => 'Host:dev.foo.fr,dev.bar.fr,dev.baz.fr; Path:/hello']
         );
 
-        $traefikHostProvider = new TraefikHostsProvider();
-        $shouldProvideHosts = $traefikHostProvider->hasHosts($containerAttributes);
+        $traefikFrontendRule = new TraefikFrontendRule();
+        $shouldProvideHosts = $traefikFrontendRule->hasHosts($containerAttributes);
 
-        $actualHosts = $traefikHostProvider->getHosts($containerAttributes);
+        $actualHosts = $traefikFrontendRule->getHosts($containerAttributes);
         $expectedHosts = ['dev.foo.fr', 'dev.bar.fr', 'dev.baz.fr'];
 
         assertTrue($shouldProvideHosts);
@@ -27,9 +27,9 @@ class TraefikHostsProviderTest extends TestCase
     public function it does not provide hostnamess when the traefik frontend rule label is absent()
     {
         $containerAttributes = new \ArrayObject();
-        $traefikHostProvider = new TraefikHostsProvider();
+        $traefikFrontendRule = new TraefikFrontendRule();
 
-        assertFalse($traefikHostProvider->hasHosts($containerAttributes));
+        assertFalse($traefikFrontendRule->hasHosts($containerAttributes));
     }
 
     /** @test */
@@ -38,8 +38,8 @@ class TraefikHostsProviderTest extends TestCase
         $containerAttributes = new \ArrayObject(
             ['traefik.frontend.rule' => 'HostRegexp:{subdomain:[a-z]+}.localhost; Path:/hello']
         );
-        $traefikHostProvider = new TraefikHostsProvider();
+        $traefikFrontendRule = new TraefikFrontendRule();
 
-        assertFalse($traefikHostProvider->hasHosts($containerAttributes));
+        assertFalse($traefikFrontendRule->hasHosts($containerAttributes));
     }
 }

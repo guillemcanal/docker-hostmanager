@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e718cb19297073416868b060ecbc6aa7",
+    "content-hash": "408144e54f76506fd5cfc90e08911575",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -1103,6 +1103,318 @@
                 "response"
             ],
             "time": "2016-08-06T14:39:51+00:00"
+        },
+        {
+            "name": "sop/asn1",
+            "version": "3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sop/asn1.git",
+                "reference": "6a198704e4928f6404cfdc38058586a795134e14"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sop/asn1/zipball/6a198704e4928f6404cfdc38058586a795134e14",
+                "reference": "6a198704e4928f6404cfdc38058586a795134e14",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gmp": "*",
+                "ext-mbstring": "*",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ASN1\\": "lib/ASN1/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joni Eskelinen",
+                    "email": "jonieske@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP library for X.690 ASN.1 DER encoding and decoding.",
+            "homepage": "https://github.com/sop/asn1",
+            "keywords": [
+                "DER",
+                "asn.1",
+                "asn1",
+                "x.690",
+                "x690"
+            ],
+            "time": "2017-12-20T08:56:15+00:00"
+        },
+        {
+            "name": "sop/crypto-bridge",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sop/crypto-bridge.git",
+                "reference": "1ab6a6a7aa4256f7398e89c2dfc9282afd5a3892"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sop/crypto-bridge/zipball/1ab6a6a7aa4256f7398e89c2dfc9282afd5a3892",
+                "reference": "1ab6a6a7aa4256f7398e89c2dfc9282afd5a3892",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "php": ">=7.0",
+                "sop/crypto-types": "^0.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sop\\CryptoBridge\\": "lib/CryptoBridge"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joni Eskelinen",
+                    "email": "jonieske@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP library providing cryptography support for various PKCS applications.",
+            "homepage": "https://github.com/sop/crypto-bridge",
+            "keywords": [
+                "cryptography",
+                "decrypt",
+                "encrypt",
+                "pkcs",
+                "sign",
+                "verify"
+            ],
+            "time": "2017-11-03T17:22:56+00:00"
+        },
+        {
+            "name": "sop/crypto-encoding",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sop/crypto-encoding.git",
+                "reference": "b5958cc213d3092cb9fa7be179adf760a8fde1f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sop/crypto-encoding/zipball/b5958cc213d3092cb9fa7be179adf760a8fde1f6",
+                "reference": "b5958cc213d3092cb9fa7be179adf760a8fde1f6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sop\\CryptoEncoding\\": "lib/CryptoEncoding"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joni Eskelinen",
+                    "email": "jonieske@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP implementation of textual encodings of cryptographic structures.",
+            "homepage": "https://github.com/sop/crypto-encoding",
+            "keywords": [
+                "Private Key",
+                "certificate",
+                "pem",
+                "public key"
+            ],
+            "time": "2017-11-03T11:35:37+00:00"
+        },
+        {
+            "name": "sop/crypto-types",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sop/crypto-types.git",
+                "reference": "1d36250a110b07300aeb003a20aeaadfc6445501"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sop/crypto-types/zipball/1d36250a110b07300aeb003a20aeaadfc6445501",
+                "reference": "1d36250a110b07300aeb003a20aeaadfc6445501",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gmp": "*",
+                "php": ">=7.0",
+                "sop/asn1": "^3.2.0",
+                "sop/crypto-encoding": "^0.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sop\\CryptoTypes\\": "lib/CryptoTypes"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joni Eskelinen",
+                    "email": "jonieske@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP library of various ASN.1 types for cryptographic applications.",
+            "homepage": "https://github.com/sop/crypto-types",
+            "keywords": [
+                "Private Key",
+                "algorithm identifier",
+                "asn1",
+                "cryptography",
+                "ec",
+                "public key",
+                "rsa",
+                "signature"
+            ],
+            "time": "2017-11-08T09:15:14+00:00"
+        },
+        {
+            "name": "sop/x501",
+            "version": "0.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sop/x501.git",
+                "reference": "fb1380c0e0f024db68d35666755c1109ef5a3af5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sop/x501/zipball/fb1380c0e0f024db68d35666755c1109ef5a3af5",
+                "reference": "fb1380c0e0f024db68d35666755c1109ef5a3af5",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "php": ">=7.0",
+                "sop/asn1": "^3.0.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "X501\\": "lib/X501/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joni Eskelinen",
+                    "email": "jonieske@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP library for X.501 ASN.1 types, X.520 attributes and DN parsing.",
+            "homepage": "https://github.com/sop/x501",
+            "keywords": [
+                "attribute",
+                "dn",
+                "ldap",
+                "rdn",
+                "x.501",
+                "x.520",
+                "x501",
+                "x520"
+            ],
+            "time": "2017-11-03T18:11:31+00:00"
+        },
+        {
+            "name": "sop/x509",
+            "version": "0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sop/x509.git",
+                "reference": "91afecb36b9ef06d6f7c001e3ada258b186c5d2a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sop/x509/zipball/91afecb36b9ef06d6f7c001e3ada258b186c5d2a",
+                "reference": "91afecb36b9ef06d6f7c001e3ada258b186c5d2a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gmp": "*",
+                "php": ">=7.0",
+                "sop/asn1": "^3.2.0",
+                "sop/crypto-bridge": "^0.2.0",
+                "sop/crypto-encoding": "^0.2.0",
+                "sop/crypto-types": "^0.2.1",
+                "sop/x501": "^0.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "X509\\": "lib/X509/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joni Eskelinen",
+                    "email": "jonieske@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP library for X.509 public key certificates, attribute certificates, certification requests and certification path validation.",
+            "homepage": "https://github.com/sop/x509",
+            "keywords": [
+                "ac",
+                "attribute certificate",
+                "certificate",
+                "certification request",
+                "csr",
+                "x.509",
+                "x509"
+            ],
+            "time": "2017-11-08T09:35:14+00:00"
         },
         {
             "name": "symfony/console",

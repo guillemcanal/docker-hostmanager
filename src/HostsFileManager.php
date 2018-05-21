@@ -27,13 +27,13 @@ class HostsFileManager
         if (!$this->hostsFile->exists()) {
             throw new \UnexpectedValueException('The hosts file could not be found');
         }
-        if (!$this->hostsFileContainsDockerStackFencedBlock()) {
+        if (!$this->hasDockerStackFencedBlock()) {
             $this->addDockerStackFencedBlock();
         }
         $this->parseHostsFile();
     }
 
-    private function hostsFileContainsDockerStackFencedBlock(): bool
+    private function hasDockerStackFencedBlock(): bool
     {
         return preg_match(self::HOSTS_FILE_FENCED_BLOCK_REGEX, $this->hostsFile->getContents()) === 1;
     }
@@ -55,6 +55,20 @@ class HostsFileManager
     {
         if (!$this->hasHostname($hostname)) {
             $this->hostnames[] = $hostname;
+        }
+    }
+
+    public function clear(): void
+    {
+        if ($this->hasDockerStackFencedBlock()) {
+            $contents = preg_replace_callback(
+                self::HOSTS_FILE_FENCED_BLOCK_REGEX,
+                function () {
+                    return "#<docker-stack>\n";
+                },
+                $this->hostsFile->getContents()
+            );
+            $this->hostsFile->putContents($contents);
         }
     }
 
