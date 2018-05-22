@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager\File;
 
 use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;

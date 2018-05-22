@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager;
 
 use Docker\API\Model\EventsGetResponse200;

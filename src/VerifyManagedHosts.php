@@ -10,18 +10,23 @@ use ElevenLabs\DockerHostManager\HostsExtractor\HostsExtractor;
 
 class VerifyManagedHosts
 {
+    /** @var HostsFileManager */
     private $hostsFileManager;
-    private $hostsExtractor;
+    /** @var array|HostsExtractor[] */
+    private $hostsExtractors = [];
+    /** @var Docker */
     private $docker;
 
     public function __construct(
         HostsFileManager $hostsFileManager,
-        HostsExtractor $hostsExtractor,
+        array $hostsExtractors,
         Docker $docker
     ) {
         $this->hostsFileManager = $hostsFileManager;
-        $this->hostsExtractor = $hostsExtractor;
         $this->docker = $docker;
+        foreach ($hostsExtractors as $hostsExtractor) {
+            $this->addHostsExtractor($hostsExtractor);
+        }
     }
 
     public function verify(): void
@@ -31,13 +36,32 @@ class VerifyManagedHosts
         /** @var ContainerSummaryItem $containerSummaryItem */
         foreach ($containerList as $containerSummaryItem) {
             $containerLabels = $containerSummaryItem->getLabels();
-            if ($this->hostsExtractor->hasHosts($containerLabels)) {
-                $hostnames = $this->hostsExtractor->getHosts($containerLabels);
-                foreach ($hostnames as $hostname) {
-                    $this->hostsFileManager->addHostname($hostname);
-                }
+            if ($containerLabels !== null) {
+                $this->extractHosts($containerLabels);
             }
         }
         $this->hostsFileManager->updateHostsFile();
+    }
+
+    private function addHostsExtractor(HostsExtractor $hostsExtractor)
+    {
+        $this->hostsExtractors[] = $hostsExtractor;
+    }
+
+    private function extractHosts(\ArrayObject $containerLabels): void
+    {
+        foreach ($this->hostsExtractors as $hostsExtractor) {
+            if ($hostsExtractor->hasHosts($containerLabels)) {
+                $hostnames = $hostsExtractor->getHosts($containerLabels);
+                $this->addHostnames($hostnames);
+            }
+        }
+    }
+
+    private function addHostnames(array $hostnames): void
+    {
+        foreach ($hostnames as $hostname) {
+            $this->hostsFileManager->addHostname($hostname);
+        }
     }
 }

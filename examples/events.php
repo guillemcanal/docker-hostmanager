@@ -2,31 +2,23 @@
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use ElevenLabs\DockerHostManager\DockerEvents;
-use ElevenLabs\DockerHostManager\File\InMemoryFile;
 use ElevenLabs\DockerHostManager\File\LocalFile;
 use ElevenLabs\DockerHostManager\HostsFileManager;
 use ElevenLabs\DockerHostManager\HostsExtractor\TraefikFrontendRule;
 use ElevenLabs\DockerHostManager\Listener\HostManagerListener;
+use ElevenLabs\DockerHostManager\VerifyManagedHosts;
 
-$docker = \Docker\Docker::create();
+$docker           = \Docker\Docker::create();
+$hostsFileManager = new HostsFileManager(new LocalFile('/etc/hosts'));
+$hostsExtractors  = [new TraefikFrontendRule()];
 
-/** @var \Docker\API\Model\ContainersCreatePostResponse201 $container */
-$container = $docker->containerCreate(
-    (new \Docker\API\Model\ContainersCreatePostBody())
-        ->setImage('busybox')
-        ->setCmd(['top'])
-        ->setLabels(new \ArrayObject(['traefik.frontend.rule' => 'Host: dev.foo.fr']))
-);
+// Verify the state of the hosts file
+$verifier = new VerifyManagedHosts($hostsFileManager, $hostsExtractors, $docker);
+$verifier->verify();
 
-$hostManager = new HostManagerListener(
-    new HostsFileManager(new LocalFile('/etc/hosts')),
-    [new TraefikFrontendRule()]
-);
-
-$events = (new DockerEvents($docker))
-    ->addListener($hostManager)
+// Listen to Docker events for 30 seconds
+(new DockerEvents($docker))
+    ->addListener(new HostManagerListener($hostsFileManager, $hostsExtractors))
     ->listenSince(5)
-    ->listenUntil(5)
+    ->listenUntil(30)
     ->listen();
-
-$docker->containerStop($container->getId());

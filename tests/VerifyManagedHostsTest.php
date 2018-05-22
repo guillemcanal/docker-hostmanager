@@ -30,7 +30,7 @@ class VerifyManagedHostsTest extends TestCase
 
         $verifyHosts = new VerifyManagedHosts(
             $hostsFileManagerMock->reveal(),
-            $hostsProviderMock->reveal(),
+            [$hostsProviderMock->reveal()],
             $dockerClientMock->reveal()
         );
 
