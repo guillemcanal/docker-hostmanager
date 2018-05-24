@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace ElevenLabs\DockerHostManager\Crypto;
 
@@ -16,30 +16,20 @@ class RsaKeyGenerator
         $this->bits = $bits;
     }
 
-    /**
-     * @todo return an object with both public and private key
-     */
-    public function generateKey(): PrivateKey
+    public function generate(): PrivateKey
     {
-        $configFile = $defaultConfigFile = __DIR__ . '/openssl.cnf';
-        $res = openssl_pkey_new(
+        $res = \openssl_pkey_new(
             [
                 'private_key_type' => \OPENSSL_KEYTYPE_RSA,
                 'private_key_bits' => $this->bits,
-                'config' => $configFile,
             ]
         );
 
-        $success = openssl_pkey_export(
+        $success = \openssl_pkey_export(
             $res,
             $privateKey,
-            null,
-            ['config' => $configFile]
+            null
         );
-
-        if ($configFile !== $defaultConfigFile) {
-            @unlink($configFile);
-        }
 
         \openssl_pkey_free($res);
         if (!$success) {
