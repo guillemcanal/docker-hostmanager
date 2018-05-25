@@ -6,9 +6,11 @@ namespace ElevenLabs\DockerHostManager\Crypto;
 
 class RsaKeyGenerator
 {
+    public const DEFAULT_KEY_BITS = 2048;
+
     private $bits;
 
-    public function __construct(int $bits = 2048)
+    public function __construct(int $bits = self::DEFAULT_KEY_BITS)
     {
         if ($bits < 2048) {
             throw new \UnexpectedValueException('Keys with fewer than 2048 bits are not allowed.');

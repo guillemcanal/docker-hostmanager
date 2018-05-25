@@ -65,7 +65,6 @@ class LocalFile implements FileHandler
         if (is_dir($dirname)) {
             return;
         }
-
         if (!mkdir($dirname, 0755, true) && !is_dir($dirname)) {
             throw new CouldNotWriteFile('Unable to create file in ' . $dirname);
         }

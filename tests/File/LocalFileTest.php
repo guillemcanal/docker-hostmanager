@@ -5,6 +5,7 @@ namespace ElevenLabs\DockerHostManager\File;
 use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
 use ElevenLabs\DockerHostManager\File\Exception\CouldNotWriteFile;
 use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +15,7 @@ class LocalFileTest extends TestCase
 
     public function setUp()
     {
-        $this->rootDirectory = vfsStream::setup('etc', 444);
+        $this->rootDirectory = vfsStream::setup('etc', 0444);
     }
 
     private function addFile($name, $content = '', $permission = 0644): vfsStreamFile
@@ -23,6 +24,14 @@ class LocalFileTest extends TestCase
         $this->rootDirectory->addChild($file);
 
         return $file;
+    }
+
+    private function addDirectory($name, $permission = 0644): vfsStreamDirectory
+    {
+        $dir = vfsStream::newDirectory($name, $permission);
+        $this->rootDirectory->addChild($dir);
+
+        return $dir;
     }
 
     /** @test */
@@ -88,5 +97,23 @@ class LocalFileTest extends TestCase
 
         $localFile = new LocalFile($filename);
         $localFile->put('new content');
+    }
+
+    /** @test */
+    public function it can be constructed with a file path()
+    {
+        $localFile = LocalFile::getFile('hello.txt');
+
+        assertThat($localFile, isInstanceOf(LocalFile::class));
+    }
+
+    /** @test */
+    public function it throw an exception when to root directory is ot writable()
+    {
+        $this->expectException(CouldNotWriteFile::class);
+        $this->expectExceptionMessage('Unable to create file in vfs://etc/foo');
+
+        $localFile = LocalFile::getFile('vfs://etc/foo/bar.txt');
+        $localFile->put('');
     }
 }

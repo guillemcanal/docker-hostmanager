@@ -68,4 +68,12 @@ class InMemoryFileTest extends TestCase
         $file->put('new content');
     }
 
+    /** @test */
+    public function it can be constructed with a file path()
+    {
+        $localFile = InMemoryFile::getFile('hello.txt');
+
+        assertThat($localFile, isInstanceOf(InMemoryFile::class));
+    }
+
 }

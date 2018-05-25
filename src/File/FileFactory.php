@@ -14,7 +14,9 @@ class FileFactory
     public function __construct($fileHandlerImpl, string $prefix = 'file:')
     {
         if (!\is_a($fileHandlerImpl, FileHandler::class, true)) {
-            throw new \UnexpectedValueException($fileHandlerImpl . ' must implements ' . FileHandler::class);
+            throw new \UnexpectedValueException(
+                $fileHandlerImpl . ' does not implements the ' . FileHandler::class . ' interface'
+            );
         }
 
         $this->prefix = new Uri($prefix);
