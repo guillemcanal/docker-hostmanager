@@ -12,17 +12,17 @@ class SubjectTest extends TestCase
     public function it provide certificate subject values()
     {
         $subject = new Subject(
-            $organizationName  = 'ACME Inc.',
-            $commonName        = 'ACME Root CA',
-            $countryName       = 'FR',
-            $stateProvinceName = 'Paris',
-            $localityName      = 'Paris'
+            $organizationName    = 'ACME Inc.',
+            $commonName          = 'ACME Root CA',
+            $countryName         = 'FR',
+            $stateOrProvinceName = 'Paris',
+            $localityName        = 'Paris'
         );
 
         assertThat($subject->getOrganizationName(), equalTo($organizationName));
         assertThat($subject->getCommonName(), equalTo($commonName));
         assertThat($subject->getCountryName(), equalTo($countryName));
-        assertThat($subject->getStateProvinceName(), equalTo($stateProvinceName));
+        assertThat($subject->getStateOrProvinceName(), equalTo($stateOrProvinceName));
         assertThat($subject->getLocalityName(), equalTo($localityName));
     }
 }

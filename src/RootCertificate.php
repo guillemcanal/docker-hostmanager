@@ -15,6 +15,7 @@ use Sop\CryptoTypes\AlgorithmIdentifier\Hash\SHA256AlgorithmIdentifier;
 use Sop\CryptoTypes\AlgorithmIdentifier\Signature\SignatureAlgorithmIdentifierFactory;
 use Sop\CryptoTypes\Asymmetric\PrivateKeyInfo;
 use Sop\CryptoTypes\Asymmetric\PublicKeyInfo;
+use X501\ASN1\AttributeValue\CommonNameValue;
 use X501\ASN1\AttributeValue\CountryNameValue;
 use X501\ASN1\AttributeValue\LocalityNameValue;
 use X501\ASN1\AttributeValue\OrganizationNameValue;
@@ -86,9 +87,9 @@ class RootCertificate
     {
         return new Name(
             RDN::fromAttributeValues(new OrganizationNameValue($this->subject->getOrganizationName())),
-            RDN::fromAttributeValues(new OrganizationNameValue($this->subject->getOrganizationName())),
+            RDN::fromAttributeValues(new CommonNameValue($this->subject->getCommonName())),
             RDN::fromAttributeValues(new CountryNameValue($this->subject->getCountryName())),
-            RDN::fromAttributeValues(new StateOrProvinceNameValue($this->subject->getStateProvinceName())),
+            RDN::fromAttributeValues(new StateOrProvinceNameValue($this->subject->getStateOrProvinceName())),
             RDN::fromAttributeValues(new LocalityNameValue($this->subject->getLocalityName()))
         );
     }

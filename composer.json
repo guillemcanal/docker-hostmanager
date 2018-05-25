@@ -15,6 +15,7 @@
     },
     "require": {
         "ext-intl": "*",
+        "ext-gmp": "*",
         "docker-php/docker-php": "^2.0",
         "yosymfony/toml": "^1.0",
         "league/flysystem": "^1.0",

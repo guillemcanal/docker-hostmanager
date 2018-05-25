@@ -39,6 +39,8 @@ class GenerateSignedCertificate implements DockerEvent
         }
 
         $containerName = $this->getContainerName($containerAttributes);
+        // @todo Only generate and save certificate when a docker container is created
+        // @todo Delete the certificate when the docker container is destroyed
         $certificateBundle = $this->generator->generate($dnsNames);
 
         $this->saveCertificate($containerName, $certificateBundle);

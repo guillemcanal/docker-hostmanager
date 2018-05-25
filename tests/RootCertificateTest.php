@@ -25,11 +25,11 @@ class RootCertificateTest extends TestCase
             new FileFactory(LocalFile::class, $this->rootDirectory->url()),
             new RsaKeyGenerator(),
             new Subject(
-                $organizationName  = 'ACME Inc.',
-                $commonName        = 'ACME Root CA',
-                $countryName       = 'FR',
-                $stateProvinceName = 'Paris',
-                $localityName      = 'Paris'
+                $organizationName    = 'ACME Inc.',
+                $commonName          = 'ACME Root CA',
+                $countryName         = 'FR',
+                $stateOrProvinceName = 'Paris',
+                $localityName        = 'Paris'
             )
         );
 
@@ -38,6 +38,14 @@ class RootCertificateTest extends TestCase
         $rootCAKey = $certificateBundle->getPrivateKeyInfo();
 
         assertThat($rootCA->verify($rootCAKey->publicKeyInfo()), equalTo(true));
+
+        $certificateSubject = $rootCA->tbsCertificate()->subject();
+
+        assertThat($certificateSubject->firstValueOf('organizationName')->stringValue(), equalTo($organizationName));
+        assertThat($certificateSubject->firstValueOf('commonName')->stringValue(), equalTo($commonName));
+        assertThat($certificateSubject->firstValueOf('countryName')->stringValue(), equalTo($countryName));
+        assertThat($certificateSubject->firstValueOf('stateOrProvinceName')->stringValue(), equalTo($stateOrProvinceName));
+        assertThat($certificateSubject->firstValueOf('localityName')->stringValue(), equalTo($localityName));
     }
 
     /** @test */
@@ -47,11 +55,11 @@ class RootCertificateTest extends TestCase
             new FileFactory(LocalFile::class, $this->rootDirectory->url()),
             new RsaKeyGenerator(),
             new Subject(
-                $organizationName  = 'ACME Inc.',
-                $commonName        = 'ACME Root CA',
-                $countryName       = 'FR',
-                $stateProvinceName = 'Paris',
-                $localityName      = 'Paris'
+                $organizationName    = 'ACME Inc.',
+                $commonName          = 'ACME Root CA',
+                $countryName         = 'FR',
+                $stateOrProvinceName = 'Paris',
+                $localityName        = 'Paris'
             )
         );
 
@@ -70,11 +78,11 @@ class RootCertificateTest extends TestCase
             new FileFactory(LocalFile::class, $fixturesDirectory),
             new RsaKeyGenerator(),
             new Subject(
-                $organizationName  = 'ACME Inc.',
-                $commonName        = 'ACME Root CA',
-                $countryName       = 'FR',
-                $stateProvinceName = 'Paris',
-                $localityName      = 'Paris'
+                $organizationName    = 'ACME Inc.',
+                $commonName          = 'ACME Root CA',
+                $countryName         = 'FR',
+                $stateOrProvinceName = 'Paris',
+                $localityName        = 'Paris'
             )
         );
 

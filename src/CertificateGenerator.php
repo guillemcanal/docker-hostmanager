@@ -87,7 +87,7 @@ class CertificateGenerator
             RDN::fromAttributeValues(new CommonNameValue($commonName)),
             RDN::fromAttributeValues(new OrganizationNameValue($this->subject->getOrganizationName())),
             RDN::fromAttributeValues(new CountryNameValue($this->subject->getCountryName())),
-            RDN::fromAttributeValues(new StateOrProvinceNameValue($this->subject->getStateProvinceName())),
+            RDN::fromAttributeValues(new StateOrProvinceNameValue($this->subject->getStateOrProvinceName())),
             RDN::fromAttributeValues(new LocalityNameValue($this->subject->getLocalityName()))
         );
     }

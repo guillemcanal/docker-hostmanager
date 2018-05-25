@@ -9,21 +9,21 @@ class Subject
     private $organizationName;
     private $commonName;
     private $countryName;
-    private $stateProvinceName;
+    private $stateOrProvinceName;
     private $localityName;
 
     public function __construct(
         string $organizationName,
         string $commonName,
         string $countryName,
-        string $stateProvinceName,
+        string $stateOrProvinceName,
         string $localityName
     ) {
-        $this->organizationName  = $organizationName;
-        $this->commonName        = $commonName;
-        $this->countryName       = $countryName;
-        $this->stateProvinceName = $stateProvinceName;
-        $this->localityName      = $localityName;
+        $this->organizationName    = $organizationName;
+        $this->commonName          = $commonName;
+        $this->countryName         = $countryName;
+        $this->stateOrProvinceName = $stateOrProvinceName;
+        $this->localityName        = $localityName;
     }
 
     public function getOrganizationName(): string
@@ -41,9 +41,9 @@ class Subject
         return $this->countryName;
     }
 
-    public function getStateProvinceName(): string
+    public function getStateOrProvinceName(): string
     {
-        return $this->stateProvinceName;
+        return $this->stateOrProvinceName;
     }
 
     public function getLocalityName(): string
