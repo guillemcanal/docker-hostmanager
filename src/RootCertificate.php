@@ -84,14 +84,13 @@ class RootCertificate
      */
     private function getSubject(): Name
     {
-        $name = new Name(
+        return new Name(
             RDN::fromAttributeValues(new OrganizationNameValue($this->subject->getOrganizationName())),
             RDN::fromAttributeValues(new OrganizationNameValue($this->subject->getOrganizationName())),
             RDN::fromAttributeValues(new CountryNameValue($this->subject->getCountryName())),
             RDN::fromAttributeValues(new StateOrProvinceNameValue($this->subject->getStateProvinceName())),
             RDN::fromAttributeValues(new LocalityNameValue($this->subject->getLocalityName()))
         );
-        return $name;
     }
 
     private function getTbsCertificate(Name $name, PublicKeyInfo $publicKeyInfo): TBSCertificate

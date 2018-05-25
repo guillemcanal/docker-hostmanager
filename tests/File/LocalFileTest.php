@@ -26,14 +26,6 @@ class LocalFileTest extends TestCase
         return $file;
     }
 
-    private function addDirectory($name, $permission = 0644): vfsStreamDirectory
-    {
-        $dir = vfsStream::newDirectory($name, $permission);
-        $this->rootDirectory->addChild($dir);
-
-        return $dir;
-    }
-
     /** @test */
     public function it read the content of a file()
     {
@@ -65,7 +57,7 @@ class LocalFileTest extends TestCase
     /** @test */
     public function it return false when a file does not exist()
     {
-        $localFile = new LocalFile('/nowhere');
+        $localFile = new LocalFile('vfs://etc/i-do-not-exist');
 
         assertFalse($localFile->exists());
     }
@@ -75,7 +67,7 @@ class LocalFileTest extends TestCase
     {
         $this->expectException(FileDoesNotExist::class);
 
-        $localFile = new LocalFile('/nowhere');
+        $localFile = new LocalFile('vfs://etc/i-do-not-exist');
         $localFile->read();
     }
 
@@ -84,7 +76,7 @@ class LocalFileTest extends TestCase
     {
         $this->expectException(CouldNotWriteFile::class);
 
-        $localFile = new LocalFile('/nowhere');
+        $localFile = new LocalFile('vfs://etc/i-do-not-exist');
         $localFile->put('new content');
     }
 

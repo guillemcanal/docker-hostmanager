@@ -8,9 +8,9 @@ use ElevenLabs\DockerHostManager\DomainNameExtractor\TraefikFrontendRule;
 use ElevenLabs\DockerHostManager\Listener\UpdateHostsFile;
 use ElevenLabs\DockerHostManager\VerifyManagedHosts;
 
-$docker           = \Docker\Docker::create();
+$docker = \Docker\Docker::create();
 $hostsFileManager = new HostsFileManager(new LocalFile('/etc/hosts'));
-$hostsExtractors  = [new TraefikFrontendRule()];
+$hostsExtractors = [new TraefikFrontendRule()];
 
 // Verify the state of the hosts file
 $verifier = new VerifyManagedHosts($hostsFileManager, $docker, ...$hostsExtractors);

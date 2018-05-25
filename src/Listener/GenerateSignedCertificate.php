@@ -54,10 +54,6 @@ class GenerateSignedCertificate implements DockerEvent
 
     private function getContainerName(\ArrayObject $containerAttributes): string
     {
-        if (!array_key_exists('name', $containerAttributes)) {
-            throw new \UnexpectedValueException('Unable to extract the name from container attributes');
-        }
-
         return $containerAttributes['name'];
     }
 
@@ -66,7 +62,7 @@ class GenerateSignedCertificate implements DockerEvent
         $dnsNames = [];
         foreach ($this->extractors as $extractor) {
             if ($extractor->provideDomainNames($containerAttributes)) {
-                $dnsNames = \array_merge(...$extractor->getDomainNames($containerAttributes));
+                \array_push($dnsNames, ...$extractor->getDomainNames($containerAttributes));
             }
         }
 
@@ -80,9 +76,9 @@ class GenerateSignedCertificate implements DockerEvent
     private function saveCertificate(string $containerName, CertificateBundle $certificateBundle): void
     {
         $certFile = $this->fileFactory->getFile('certs/' . $containerName . '.crt');
-        $certFile->put((string) $certificateBundle->getCertificate());
+        $certFile->put((string) $certificateBundle->getCertificate()->toPEM());
 
         $keyFile = $this->fileFactory->getFile('keys/' . $containerName . '.key');
-        $keyFile->put((string) $certificateBundle->getPrivateKeyInfo());
+        $keyFile->put((string) $certificateBundle->getPrivateKeyInfo()->toPEM());
     }
 }

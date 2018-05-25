@@ -14,7 +14,7 @@ class RsaKeyGeneratorTest extends TestCase
         $rsaPrivateKey  = (new RsaKeyGenerator())->generate();
         $privateKeyDetails = $this->getPrivateKeyDetails($rsaPrivateKey);
 
-        assertThat($privateKeyDetails['bits'], equalTo(RsaKeyGenerator::DEFAULT_KEY_BITS));
+        assertThat($privateKeyDetails['bits'], equalTo(RsaKeyGenerator::DEFAULT_KEY_SIZE));
         assertThat($privateKeyDetails['type'], equalTo(OPENSSL_KEYTYPE_RSA));
     }
 
