@@ -6,27 +6,25 @@ namespace ElevenLabs\DockerHostManager;
 
 use Docker\API\Model\ContainerSummaryItem;
 use Docker\Docker;
-use ElevenLabs\DockerHostManager\HostsExtractor\HostsExtractor;
+use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
 
 class VerifyManagedHosts
 {
     /** @var HostsFileManager */
     private $hostsFileManager;
-    /** @var array|HostsExtractor[] */
-    private $hostsExtractors = [];
+    /** @var array|DomainNameExtractor[] */
+    private $domainNameExtractors = [];
     /** @var Docker */
     private $docker;
 
     public function __construct(
         HostsFileManager $hostsFileManager,
-        array $hostsExtractors,
-        Docker $docker
+        Docker $docker,
+        DomainNameExtractor ...$domainNameExtractors
     ) {
         $this->hostsFileManager = $hostsFileManager;
         $this->docker = $docker;
-        foreach ($hostsExtractors as $hostsExtractor) {
-            $this->addHostsExtractor($hostsExtractor);
-        }
+        $this->domainNameExtractors = $domainNameExtractors;
     }
 
     public function verify(): void
@@ -37,22 +35,17 @@ class VerifyManagedHosts
         foreach ($containerList as $containerSummaryItem) {
             $containerLabels = $containerSummaryItem->getLabels();
             if ($containerLabels !== null) {
-                $this->extractHosts($containerLabels);
+                $this->extractDomainNames($containerLabels);
             }
         }
         $this->hostsFileManager->updateHostsFile();
     }
 
-    private function addHostsExtractor(HostsExtractor $hostsExtractor)
+    private function extractDomainNames(\ArrayObject $containerLabels): void
     {
-        $this->hostsExtractors[] = $hostsExtractor;
-    }
-
-    private function extractHosts(\ArrayObject $containerLabels): void
-    {
-        foreach ($this->hostsExtractors as $hostsExtractor) {
-            if ($hostsExtractor->hasHosts($containerLabels)) {
-                $hostnames = $hostsExtractor->getHosts($containerLabels);
+        foreach ($this->domainNameExtractors as $hostsExtractor) {
+            if ($hostsExtractor->provideDomainNames($containerLabels)) {
+                $hostnames = $hostsExtractor->getDomainNames($containerLabels);
                 $this->addHostnames($hostnames);
             }
         }
@@ -61,7 +54,7 @@ class VerifyManagedHosts
     private function addHostnames(array $hostnames): void
     {
         foreach ($hostnames as $hostname) {
-            $this->hostsFileManager->addHostname($hostname);
+            $this->hostsFileManager->addDomainName($hostname);
         }
     }
 }

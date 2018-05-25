@@ -2,18 +2,18 @@
 
 declare(strict_types = 1);
 
-namespace ElevenLabs\DockerHostManager\HostsExtractor;
+namespace ElevenLabs\DockerHostManager\DomainNameExtractor;
 
 /**
- * Extract hosts from the `traefik.frontend.rule` Traefik Docker label
+ * Extract domain names from the `traefik.frontend.rule` Traefik Docker label
  */
-class TraefikFrontendRule implements HostsExtractor
+class TraefikFrontendRule implements DomainNameExtractor
 {
     const HOSTS_ATTRIBUTE_KEY = 'traefik.frontend.rule';
 
-    private $hosts;
+    private $domainNames = [];
 
-    public function hasHosts(\ArrayObject $attributes): bool
+    public function provideDomainNames(\ArrayObject $attributes): bool
     {
         if (!array_key_exists(self::HOSTS_ATTRIBUTE_KEY, $attributes)) {
             return false;
@@ -23,17 +23,14 @@ class TraefikFrontendRule implements HostsExtractor
             return false;
         }
 
-        $this->hosts = $parsedFrontendRules['Host'];
+        $this->domainNames = $parsedFrontendRules['Host'];
 
         return true;
     }
 
-    /**
-     * @todo Check that $this->hosts is an array
-     */
-    public function getHosts(\ArrayObject $attributes): array
+    public function getDomainNames(\ArrayObject $attributes): array
     {
-        return $this->hosts;
+        return $this->domainNames;
     }
 
     private function parseFrontendRules(string $frontEndRulesString)

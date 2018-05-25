@@ -5,10 +5,20 @@ declare(strict_types = 1);
 namespace ElevenLabs\DockerHostManager\File;
 
 use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
-use ElevenLabs\DockerHostManager\File\Exception\FileNotWritable;
+use ElevenLabs\DockerHostManager\File\Exception\CouldNotWriteFile;
+use ElevenLabs\DockerHostManager\File\Exception\UnableToCreateFile;
 
 interface FileHandler
 {
+    /**
+     * Create a file at a given path
+     *
+     * @param string $path
+     *
+     * @return FileHandler
+     */
+    public static function getFile(string $path): FileHandler;
+
     /**
      * Check if a file exists
      *
@@ -17,21 +27,21 @@ interface FileHandler
     public function exists(): bool;
 
     /**
-     * Return the content of a file
+     * Read the content of a file
      *
      * @return  string A file content
      *
      * @throws FileDoesNotExist When the file does not exists
      */
-    public function getContents(): string;
+    public function read(): string;
 
     /**
-     * Write a string to a file
+     * Put content in a file
      *
      * @param string $contents
      *
-     * @throws FileDoesNotExist When the file does not exists
-     * @throws FileNotWritable  When the file is not writable
+     * @throws FileDoesNotExist   When the file does not exists
+     * @throws CouldNotWriteFile  When the file is not writable
      */
-    public function putContents(string $contents): void;
+    public function put(string $contents): void;
 }

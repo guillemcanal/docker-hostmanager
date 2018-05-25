@@ -16,7 +16,7 @@ class RsaKeyGenerator
         $this->bits = $bits;
     }
 
-    public function generate(): PrivateKey
+    public function generate(): string
     {
         $res = \openssl_pkey_new(
             [
@@ -25,17 +25,13 @@ class RsaKeyGenerator
             ]
         );
 
-        $success = \openssl_pkey_export(
-            $res,
-            $privateKey,
-            null
-        );
+        $success = \openssl_pkey_export($res, $privateKey);
 
         \openssl_pkey_free($res);
         if (!$success) {
             throw new \RuntimeException('Key export failed!');
         }
 
-        return new PrivateKey($privateKey);
+        return $privateKey;
     }
 }

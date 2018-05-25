@@ -7,14 +7,14 @@ namespace ElevenLabs\DockerHostManager;
 use Docker\API\Model\EventsGetResponse200;
 use Docker\Docker;
 use Docker\Stream\EventStream;
-use ElevenLabs\DockerHostManager\Listener\DockerEventListener;
+use ElevenLabs\DockerHostManager\Listener\DockerEvent;
 
 class DockerEvents
 {
     /** @var Docker */
     private $docker;
 
-    /** @var DockerEvents[] */
+    /** @var DockerEvent[] */
     private $listeners;
 
     /** @var array */
@@ -25,7 +25,7 @@ class DockerEvents
         $this->docker = $docker ?: Docker::create();
     }
 
-    public function addListener(DockerEventListener $listener): self
+    public function addListener(DockerEvent $listener): self
     {
         $this->listeners[] = $listener;
 

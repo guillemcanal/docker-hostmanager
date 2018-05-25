@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace ElevenLabs\DockerHostManager\File;
 
 use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
-use ElevenLabs\DockerHostManager\File\Exception\FileNotWritable;
+use ElevenLabs\DockerHostManager\File\Exception\CouldNotWriteFile;
 
 class InMemoryFile implements FileHandler
 {
@@ -23,6 +23,11 @@ class InMemoryFile implements FileHandler
         $this->writable = $isWritable;
     }
 
+    public static function getFile(string $path): FileHandler
+    {
+        return new self();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -34,7 +39,7 @@ class InMemoryFile implements FileHandler
     /**
      * {@inheritdoc}
      */
-    public function getContents(): string
+    public function read(): string
     {
         if (!$this->exists()) {
             throw new FileDoesNotExist('Could not find file');
@@ -45,13 +50,13 @@ class InMemoryFile implements FileHandler
     /**
      * {@inheritdoc}
      */
-    public function putContents(string $contents): void
+    public function put(string $contents): void
     {
         if (!$this->exists()) {
             throw new FileDoesNotExist('Could not find file');
         }
         if ($this->writable === false) {
-            throw new FileNotWritable('Could not write in file');
+            throw new CouldNotWriteFile('Could not write in file');
         }
         $this->contents = $contents;
     }

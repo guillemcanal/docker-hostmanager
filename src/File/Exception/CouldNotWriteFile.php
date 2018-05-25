@@ -2,6 +2,6 @@
 
 namespace ElevenLabs\DockerHostManager\File\Exception;
 
-class FileNotWritable extends \Exception
+class CouldNotWriteFile extends \Exception
 {
 }

@@ -5,7 +5,8 @@ declare(strict_types = 1);
 namespace ElevenLabs\DockerHostManager\File;
 
 use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
-use ElevenLabs\DockerHostManager\File\Exception\FileNotWritable;
+use ElevenLabs\DockerHostManager\File\Exception\CouldNotWriteFile;
+use ElevenLabs\DockerHostManager\File\Exception\UnableToCreateFile;
 
 class LocalFile implements FileHandler
 {
@@ -20,6 +21,14 @@ class LocalFile implements FileHandler
     /**
      * {@inheritdoc}
      */
+    public static function getFile(string $path): FileHandler
+    {
+        return new self($path);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function exists(): bool
     {
         return file_exists($this->filename);
@@ -28,7 +37,7 @@ class LocalFile implements FileHandler
     /**
      * {@inheritdoc}
      */
-    public function getContents(): string
+    public function read(): string
     {
         if (!$this->exists()) {
             throw new FileDoesNotExist('Could not find file at ' . $this->filename);
@@ -40,13 +49,25 @@ class LocalFile implements FileHandler
     /**
      * {@inheritdoc}
      */
-    public function putContents(string $contents): void
+    public function put(string $contents): void
     {
         if (!$this->exists()) {
-            throw new FileDoesNotExist('Could not find file at ' . $this->filename);
+            $this->createFileDirectory();
         }
         if (@file_put_contents($this->filename, $contents) === false) {
-            throw new FileNotWritable('Could not write in file ' . $this->filename);
+            throw new CouldNotWriteFile('Could not write in file ' . $this->filename);
+        }
+    }
+
+    private function createFileDirectory(): void
+    {
+        $dirname = \dirname($this->filename);
+        if (is_dir($dirname)) {
+            return;
+        }
+
+        if (!mkdir($dirname, 0755, true) && !is_dir($dirname)) {
+            throw new CouldNotWriteFile('Unable to create file in ' . $dirname);
         }
     }
 

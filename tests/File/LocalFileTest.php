@@ -3,7 +3,7 @@
 namespace ElevenLabs\DockerHostManager\File;
 
 use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
-use ElevenLabs\DockerHostManager\File\Exception\FileNotWritable;
+use ElevenLabs\DockerHostManager\File\Exception\CouldNotWriteFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\TestCase;
@@ -26,12 +26,12 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it provide the content of a file()
+    public function it read the content of a file()
     {
         $filename  = $this->addFile('hosts', 'some content')->url();
         $localFile = new LocalFile($filename);
 
-        assertThat($localFile->getContents(), equalTo('some content'));
+        assertThat($localFile->read(), equalTo('some content'));
     }
 
     /** @test */
@@ -39,9 +39,9 @@ class LocalFileTest extends TestCase
     {
         $filename  = $this->addFile('hosts')->url();
         $localFile = new LocalFile($filename);
-        $localFile->putContents('new content');
+        $localFile->put('new content');
 
-        assertThat($localFile->getContents(), equalTo('new content'));
+        assertThat($localFile->read(), equalTo('new content'));
     }
 
     /** @test */
@@ -67,7 +67,7 @@ class LocalFileTest extends TestCase
         $this->expectException(FileDoesNotExist::class);
 
         $localFile = new LocalFile('/nowhere');
-        $localFile->getContents();
+        $localFile->read();
     }
 
     /** @test */
@@ -76,17 +76,17 @@ class LocalFileTest extends TestCase
         $this->expectException(FileDoesNotExist::class);
 
         $localFile = new LocalFile('/nowhere');
-        $localFile->putContents('new content');
+        $localFile->put('new content');
     }
 
     /** @test */
     public function it throw an exception when trying to update the content of a file which is not writable()
     {
-        $this->expectException(FileNotWritable::class);
+        $this->expectException(CouldNotWriteFile::class);
 
         $filename = $this->addFile('hosts', '', 0444)->url();
 
         $localFile = new LocalFile($filename);
-        $localFile->putContents('new content');
+        $localFile->put('new content');
     }
 }

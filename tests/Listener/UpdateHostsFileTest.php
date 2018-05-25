@@ -5,20 +5,20 @@ namespace ElevenLabs\DockerHostManager\Listener;
 use Docker\API\Model\EventsGetResponse200;
 use Docker\API\Model\EventsGetResponse200Actor;
 use ElevenLabs\DockerHostManager\HostsFileManager;
-use ElevenLabs\DockerHostManager\HostsExtractor\HostsExtractor;
+use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
 use PHPUnit\Framework\TestCase;
 
-class HostManagerListenerTest extends TestCase
+class UpdateHostsFileTest extends TestCase
 {
     /** @test */
     public function it supports docker container create events()
     {
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
+        $hostsExtractorMock = $this->prophesize(DomainNameExtractor::class);
 
-        $listener = new HostManagerListener(
+        $listener = new UpdateHostsFile(
             $hostsFileManagerMock->reveal(),
-            [$hostsExtractorMock->reveal()]
+            $hostsExtractorMock->reveal()
         );
 
         $event = $this->prophesize(EventsGetResponse200::class);
@@ -32,11 +32,11 @@ class HostManagerListenerTest extends TestCase
     public function it supports docker container destroy events()
     {
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
+        $hostsExtractorMock = $this->prophesize(DomainNameExtractor::class);
 
-        $listener = new HostManagerListener(
+        $listener = new UpdateHostsFile(
             $hostsFileManagerMock->reveal(),
-            [$hostsExtractorMock->reveal()]
+            $hostsExtractorMock->reveal()
         );
 
         $event = $this->prophesize(EventsGetResponse200::class);
@@ -47,7 +47,7 @@ class HostManagerListenerTest extends TestCase
     }
 
     /** @test */
-    public function it handle container create events by adding hostnames in the hosts file()
+    public function it handle container create events by adding domain names in the hosts file()
     {
         $actor = new EventsGetResponse200Actor();
         $actor->setAttributes($attributes = new \ArrayObject());
@@ -56,18 +56,18 @@ class HostManagerListenerTest extends TestCase
         $event->setAction('create');
         $event->setActor($actor);
 
-        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
-        $hostsExtractorMock->hasHosts($attributes)->willReturn(true);
-        $hostsExtractorMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
+        $hostsExtractorMock = $this->prophesize(DomainNameExtractor::class);
+        $hostsExtractorMock->provideDomainNames($attributes)->willReturn(true);
+        $hostsExtractorMock->getDomainNames($attributes)->willReturn(['foo.fr', 'bar.fr']);
 
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsFileManagerMock->addHostname('foo.fr')->shouldBeCalledTimes(1);
-        $hostsFileManagerMock->addHostname('bar.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->addDomainName('foo.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->addDomainName('bar.fr')->shouldBeCalledTimes(1);
         $hostsFileManagerMock->updateHostsFile()->shouldBeCalledTimes(1);
 
-        $listener = new HostManagerListener(
+        $listener = new UpdateHostsFile(
             $hostsFileManagerMock->reveal(),
-            [$hostsExtractorMock->reveal()]
+            $hostsExtractorMock->reveal()
         );
 
         $listener->handle($event);
@@ -83,18 +83,18 @@ class HostManagerListenerTest extends TestCase
         $event->setAction('destroy');
         $event->setActor($actor);
 
-        $hostsExtractorMock = $this->prophesize(HostsExtractor::class);
-        $hostsExtractorMock->hasHosts($attributes)->willReturn(true);
-        $hostsExtractorMock->getHosts($attributes)->willReturn(['foo.fr', 'bar.fr']);
+        $hostsExtractorMock = $this->prophesize(DomainNameExtractor::class);
+        $hostsExtractorMock->provideDomainNames($attributes)->willReturn(true);
+        $hostsExtractorMock->getDomainNames($attributes)->willReturn(['foo.fr', 'bar.fr']);
 
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
-        $hostsFileManagerMock->removeHostname('foo.fr')->shouldBeCalledTimes(1);
-        $hostsFileManagerMock->removeHostname('bar.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->removeDomainName('foo.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->removeDomainName('bar.fr')->shouldBeCalledTimes(1);
         $hostsFileManagerMock->updateHostsFile()->shouldBeCalledTimes(1);
 
-        $listener = new HostManagerListener(
+        $listener = new UpdateHostsFile(
             $hostsFileManagerMock->reveal(),
-            [$hostsExtractorMock->reveal()]
+            $hostsExtractorMock->reveal()
         );
 
         $listener->handle($event);

@@ -35,7 +35,7 @@ class HostFileManagerTest extends TestCase
 
         new HostsFileManager($hostsFile);
 
-        assertThat($hostsFile->getContents(), equalTo($expectedContent));
+        assertThat($hostsFile->read(), equalTo($expectedContent));
     }
 
     /** @test */
@@ -53,8 +53,8 @@ class HostFileManagerTest extends TestCase
 
         $hostFileManager = new HostsFileManager(new InMemoryFile($actualContent));
 
-        assertTrue($hostFileManager->hasHostname('dev.foo.fr'));
-        assertTrue($hostFileManager->hasHostname('dev.bar.fr'));
+        assertTrue($hostFileManager->hasDomainName('dev.foo.fr'));
+        assertTrue($hostFileManager->hasDomainName('dev.bar.fr'));
     }
 
     /** @test */
@@ -83,11 +83,11 @@ class HostFileManagerTest extends TestCase
         $hostsFile = new InMemoryFile($actualContent);
 
         $hostsFileManager = new HostsFileManager($hostsFile);
-        $hostsFileManager->addHostname('dev.baz.fr');
+        $hostsFileManager->addDomainName('dev.baz.fr');
         $hostsFileManager->updateHostsFile();
 
-        assertTrue($hostsFileManager->hasHostname('dev.baz.fr'));
-        assertThat($hostsFile->getContents(), equalTo($expectedContent));
+        assertTrue($hostsFileManager->hasDomainName('dev.baz.fr'));
+        assertThat($hostsFile->read(), equalTo($expectedContent));
     }
 
     /** @test */
@@ -114,11 +114,11 @@ class HostFileManagerTest extends TestCase
         $hostsFile = new InMemoryFile($actualContent);
 
         $hostsFileManager = new HostsFileManager($hostsFile);
-        $hostsFileManager->removeHostname('dev.bar.fr');
+        $hostsFileManager->removeDomainName('dev.bar.fr');
         $hostsFileManager->updateHostsFile();
 
-        assertFalse($hostsFileManager->hasHostname('dev.baz.fr'));
-        assertThat($hostsFile->getContents(), equalTo($expectedContent));
+        assertFalse($hostsFileManager->hasDomainName('dev.baz.fr'));
+        assertThat($hostsFile->read(), equalTo($expectedContent));
     }
 
     /** @test */
@@ -166,6 +166,6 @@ class HostFileManagerTest extends TestCase
         $hostsFileManager = new HostsFileManager($file);
         $hostsFileManager->clear();
 
-        assertThat($file->getContents(), equalTo($expectedContent));
+        assertThat($file->read(), equalTo($expectedContent));
     }
 }
