@@ -4,7 +4,7 @@ namespace ElevenLabs\DockerHostManager;
 
 use Docker\API\Model\ContainerSummaryItem;
 use Docker\Docker;
-use ElevenLabs\DockerHostManager\HostsExtractor\HostsExtractor;
+use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
 use PHPUnit\Framework\TestCase;
 
 class VerifyManagedHostsTest extends TestCase
@@ -19,19 +19,19 @@ class VerifyManagedHostsTest extends TestCase
         $dockerClientMock = $this->prophesize(Docker::class);
         $dockerClientMock->containerList()->willReturn($containersSummaries);
 
-        $hostsProviderMock = $this->prophesize(HostsExtractor::class);
-        $hostsProviderMock->hasHosts($containerLabels)->willReturn(true);
-        $hostsProviderMock->getHosts($containerLabels)->willReturn(['dev.foo.fr']);
+        $hostsProviderMock = $this->prophesize(DomainNameExtractor::class);
+        $hostsProviderMock->provideDomainNames($containerLabels)->willReturn(true);
+        $hostsProviderMock->getDomainNames($containerLabels)->willReturn(['dev.foo.fr']);
 
         $hostsFileManagerMock = $this->prophesize(HostsFileManager::class);
         $hostsFileManagerMock->clear()->shouldBeCalledTimes(1);
-        $hostsFileManagerMock->addHostname('dev.foo.fr')->shouldBeCalledTimes(1);
+        $hostsFileManagerMock->addDomainName('dev.foo.fr')->shouldBeCalledTimes(1);
         $hostsFileManagerMock->updateHostsFile()->shouldBeCalledTimes(1);
 
         $verifyHosts = new VerifyManagedHosts(
             $hostsFileManagerMock->reveal(),
-            [$hostsProviderMock->reveal()],
-            $dockerClientMock->reveal()
+            $dockerClientMock->reveal(),
+            $hostsProviderMock->reveal()
         );
 
         $verifyHosts->verify();

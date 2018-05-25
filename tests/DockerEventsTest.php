@@ -6,7 +6,7 @@ use Closure;
 use Docker\API\Model\EventsGetResponse200;
 use Docker\Docker;
 use Docker\Stream\EventStream;
-use ElevenLabs\DockerHostManager\Listener\DockerEventListener;
+use ElevenLabs\DockerHostManager\Listener\DockerEvent;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -31,7 +31,7 @@ class DockerEventsTest extends TestCase
         $dockerMock = $this->prophesize(Docker::class);
         $dockerMock->systemEvents([])->willReturn($eventStream);
 
-        $dockerEventListenerMock = $this->prophesize(DockerEventListener::class);
+        $dockerEventListenerMock = $this->prophesize(DockerEvent::class);
         $dockerEventListenerMock->support($dockerEvent)->willReturn(true);
         $dockerEventListenerMock->handle($dockerEvent)->shouldBeCalledTimes(1);
 

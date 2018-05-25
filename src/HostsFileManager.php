@@ -37,26 +37,26 @@ class HostsFileManager
 
     private function hasDockerStackFencedBlock(): bool
     {
-        return preg_match(self::HOSTS_FILE_FENCED_BLOCK_REGEX, $this->hostsFile->getContents()) === 1;
+        return preg_match(self::HOSTS_FILE_FENCED_BLOCK_REGEX, $this->hostsFile->read()) === 1;
     }
 
     private function addDockerStackFencedBlock(): void
     {
-        $this->hostsFile->putContents(
-            $this->hostsFile->getContents()
+        $this->hostsFile->put(
+            $this->hostsFile->read()
             . "\n#<docker-stack>\n#</docker-stack>\n"
         );
     }
 
-    public function hasHostname(string $hostname): bool
+    public function hasDomainName(string $domainName): bool
     {
-        return \in_array($hostname, $this->hostnames, true);
+        return \in_array($domainName, $this->hostnames, true);
     }
 
-    public function addHostname(string $hostname): void
+    public function addDomainName(string $domainName): void
     {
-        if (!$this->hasHostname($hostname)) {
-            $this->hostnames[] = $hostname;
+        if (!$this->hasDomainName($domainName)) {
+            $this->hostnames[] = $domainName;
         }
     }
 
@@ -68,16 +68,16 @@ class HostsFileManager
                 function () {
                     return "#<docker-stack>\n";
                 },
-                $this->hostsFile->getContents()
+                $this->hostsFile->read()
             );
-            $this->hostsFile->putContents($contents);
+            $this->hostsFile->put($contents);
         }
     }
 
-    public function removeHostname(string $hostname): void
+    public function removeDomainName(string $domainName): void
     {
-        if ($this->hasHostname($hostname)) {
-            unset($this->hostnames[array_search($hostname, $this->hostnames, true)]);
+        if ($this->hasDomainName($domainName)) {
+            unset($this->hostnames[array_search($domainName, $this->hostnames, true)]);
         }
     }
 
@@ -98,15 +98,15 @@ class HostsFileManager
             function () use ($domains) {
                 return "#<docker-stack>\n" . $domains . "\n";
             },
-            $this->hostsFile->getContents()
+            $this->hostsFile->read()
         );
 
-        $this->hostsFile->putContents($contents);
+        $this->hostsFile->put($contents);
     }
 
     private function parseHostsFile(): void
     {
-        $contents = $this->hostsFile->getContents();
+        $contents = $this->hostsFile->read();
 
         preg_match(self::HOSTS_FILE_FENCED_BLOCK_REGEX, $contents, $matches);
         if (!array_key_exists(1, $matches)) {
@@ -122,7 +122,7 @@ class HostsFileManager
             if (\count($matched) !== 2) {
                 throw new \RuntimeException('Expected exactly one IP address and one hostname, got ' . $rawDomain);
             }
-            $this->addHostname($matched[1]);
+            $this->addDomainName($matched[1]);
         }
     }
 }
