@@ -73,7 +73,7 @@ class LocalFileTest extends TestCase
     /** @test */
     public function it throw an exception when trying to update the content of the file which do not exist()
     {
-        $this->expectException(FileDoesNotExist::class);
+        $this->expectException(CouldNotWriteFile::class);
 
         $localFile = new LocalFile('/nowhere');
         $localFile->put('new content');
