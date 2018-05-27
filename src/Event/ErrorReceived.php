@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Event;
 
@@ -25,17 +25,17 @@ class ErrorReceived implements Event
     public function toArray(): array
     {
         return [
-            'message'   => $this->getMessage(),
+            'message' => $this->getMessage(),
             'exception' => [
-                'name'    => \get_class($this->exception),
-                'message' => $this->exception->getMessage()
-            ]
+                'name' => \get_class($this->exception),
+                'message' => $this->exception->getMessage(),
+            ],
         ];
     }
 
     public function __construct($message, \Exception $e)
     {
-        $this->message   = $message;
+        $this->message = $message;
         $this->exception = $e;
     }
 

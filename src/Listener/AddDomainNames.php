@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
@@ -31,7 +31,7 @@ class AddDomainNames implements EventListener, EventProducer
             } catch (\Exception $e) {
                 $this->produceEvent(
                     new ErrorReceived(
-                        sprintf(
+                        \sprintf(
                             'Unable to add domain name %s for container %s',
                             $domainName->getName(),
                             $domainName->getContainerName()
@@ -48,7 +48,7 @@ class AddDomainNames implements EventListener, EventProducer
     {
         return new EventSubscription(
             DomainNamesAdded::class,
-            function (DomainNamesAdded $event) {
+            function (DomainNamesAdded $event): void {
                 $this->handle($event);
             }
         );
@@ -62,7 +62,7 @@ class AddDomainNames implements EventListener, EventProducer
         return $events;
     }
 
-    private function produceEvent($event)
+    private function produceEvent($event): void
     {
         $this->producedEvents[] = $event;
     }

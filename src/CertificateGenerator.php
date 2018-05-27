@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager;
 
@@ -32,7 +32,7 @@ use X509\GeneralName\DNSName;
 use X509\GeneralName\GeneralNames;
 
 /**
- * Generate a certificate
+ * Generate a certificate.
  */
 class CertificateGenerator
 {
@@ -52,7 +52,7 @@ class CertificateGenerator
 
     public function generate(array $dnsNames): CertificateBundle
     {
-        $commonName = array_shift($dnsNames);
+        $commonName = \array_shift($dnsNames);
         $privateKeyInfo = $this->getPrivateKeyInfo();
 
         $certificationRequestInfo = $this->getCertificationRequestInfo(
@@ -112,7 +112,7 @@ class CertificateGenerator
                 new SubjectAlternativeNameExtension(
                     false,
                     new GeneralNames(
-                        ...array_map(
+                        ...\array_map(
                             function (string $dnsName) {
                                 return new DNSName($dnsName);
                             },

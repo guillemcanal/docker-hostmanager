@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Cert;
 
@@ -19,11 +19,11 @@ class Subject
         string $stateOrProvinceName,
         string $localityName
     ) {
-        $this->organizationName    = $organizationName;
-        $this->commonName          = $commonName;
-        $this->countryName         = $countryName;
+        $this->organizationName = $organizationName;
+        $this->commonName = $commonName;
+        $this->countryName = $countryName;
         $this->stateOrProvinceName = $stateOrProvinceName;
-        $this->localityName        = $localityName;
+        $this->localityName = $localityName;
     }
 
     public function getOrganizationName(): string

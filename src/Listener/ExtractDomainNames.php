@@ -1,15 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use Docker\API\Model\EventsGetResponse200;
 use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
-use ElevenLabs\DockerHostManager\Event\DomainNamesEvent;
 use ElevenLabs\DockerHostManager\Event\DockerEventReceived;
+use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
+use ElevenLabs\DockerHostManager\Event\DomainNamesEvent;
+use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
@@ -28,7 +28,7 @@ class ExtractDomainNames implements EventListener, EventProducer
     {
         return new EventSubscription(
             DockerEventReceived::class,
-            function (DockerEventReceived $event) {
+            function (DockerEventReceived $event): void {
                 $dockerEvent = $event->getEvent();
                 if ($this->support($dockerEvent)) {
                     $this->handle($dockerEvent);
@@ -47,22 +47,22 @@ class ExtractDomainNames implements EventListener, EventProducer
 
     private function support(EventsGetResponse200 $event)
     {
-        return $event->getType() === 'container'
+        return 'container' === $event->getType()
             && \in_array($event->getAction(), ['create', 'destroy'], true)
-            && $event->getActor() !== null
-            && $event->getActor()->getAttributes() !== null;
+            && null !== $event->getActor()
+            && null !== $event->getActor()->getAttributes();
     }
 
-    private function handle(EventsGetResponse200 $event)
+    private function handle(EventsGetResponse200 $event): void
     {
         $containerAttributes = $event->getActor()->getAttributes();
         $containerName = $this->getContainerName($containerAttributes);
         $domainNames = $this->extractDomainNamesFromTheHostsFile($containerAttributes);
 
-        if (!empty($domainNames) && $event->getAction() === 'create') {
+        if (!empty($domainNames) && 'create' === $event->getAction()) {
             $this->produceEvent(new DomainNamesAdded($containerName, $domainNames));
         }
-        if (!empty($domainNames) && $event->getAction() === 'destroy') {
+        if (!empty($domainNames) && 'destroy' === $event->getAction()) {
             $this->produceEvent(new DomainNamesRemoved($containerName, $domainNames));
         }
     }
@@ -84,7 +84,7 @@ class ExtractDomainNames implements EventListener, EventProducer
         return $dnsNames;
     }
 
-    private function produceEvent(DomainNamesEvent $event)
+    private function produceEvent(DomainNamesEvent $event): void
     {
         $this->producedEvents[] = $event;
     }

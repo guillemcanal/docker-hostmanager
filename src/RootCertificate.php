@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager;
 
@@ -8,7 +8,6 @@ use ElevenLabs\DockerHostManager\Cert\CertificateBundle;
 use ElevenLabs\DockerHostManager\Cert\Subject;
 use ElevenLabs\DockerHostManager\Crypto\RsaKeyGenerator;
 use ElevenLabs\DockerHostManager\File\Directory;
-use ElevenLabs\DockerHostManager\File\FileFactory;
 use ElevenLabs\DockerHostManager\File\File;
 use Sop\CryptoEncoding\PEM;
 use Sop\CryptoTypes\AlgorithmIdentifier\Feature\SignatureAlgorithmIdentifier;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager;
 
@@ -32,7 +32,7 @@ class DockerEvents
         /** @var EventStream $events */
         $events = $this->docker->systemEvents();
         $events->onFrame(
-            function ($event) {
+            function ($event): void {
                 if (\is_object($event) && $event instanceof EventsGetResponse200) {
                     $this->dispatcher->dispatch(new DockerEventReceived($event));
                 }
@@ -43,9 +43,9 @@ class DockerEvents
 
     private function listContainerNames(): void
     {
-        $names = array_map(
+        $names = \array_map(
             function (ContainerSummaryItem $item) {
-                return ltrim(current($item->getNames()), '/');
+                return \ltrim(\current($item->getNames()), '/');
             },
             $this->docker->containerList()
         );

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\File;
 
@@ -11,8 +11,8 @@ class LocalDirectory implements Directory
     public function __construct($dirname)
     {
         $schemeSeparator = '://';
-        if (strpos($dirname, $schemeSeparator) === false) {
-            $dirname = 'file://' . $dirname;
+        if (false === \strpos($dirname, $schemeSeparator)) {
+            $dirname = 'file://'.$dirname;
         }
 
         $this->dirname = $dirname;
@@ -25,12 +25,12 @@ class LocalDirectory implements Directory
 
     public function file(string $path): File
     {
-        return LocalFile::get($this->uri() . '/' . $path);
+        return LocalFile::get($this->uri().'/'.$path);
     }
 
     public function exists(): bool
     {
-        return is_dir($this->dirname);
+        return \is_dir($this->dirname);
     }
 
     public function uri(): string

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use ElevenLabs\DockerHostManager\EventDispatcher\Event;
@@ -15,7 +18,7 @@ class LogEvents implements EventListener
     private const EVENT_LOG_LEVELS = [
         EventType::EVENT_STANDARD => LogLevel::INFO,
         EventType::EVENT_ERROR => LogLevel::ERROR,
-        EventType::EVENT_INTERNAL => LogLevel::DEBUG
+        EventType::EVENT_INTERNAL => LogLevel::DEBUG,
     ];
 
     public function __construct(LoggerInterface $logger)
@@ -27,7 +30,7 @@ class LogEvents implements EventListener
     {
         return new EventSubscription(
             Event::class,
-            function (Event $event) {
+            function (Event $event): void {
                 $this->logEvent($event);
             }
         );
@@ -35,7 +38,7 @@ class LogEvents implements EventListener
 
     private function logEvent(Event $event): void
     {
-        $this->logger->log($this->logLevel($event->getType()),  $event->getName(), $event->toArray());
+        $this->logger->log($this->logLevel($event->getType()), $event->getName(), $event->toArray());
     }
 
     private function logLevel(EventType $eventType): string
