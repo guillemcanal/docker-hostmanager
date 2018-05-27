@@ -42,7 +42,7 @@ class CleanTheHostsFile implements EventListener, EventProducer
     public function cleanup(array $containerNames): void
     {
         foreach ($this->hostsFileManager->getDomainNames() as $domainName) {
-            if (!\in_array($domainName->getName(), $containerNames, true)) {
+            if (!\in_array($domainName->getContainerName(), $containerNames, true)) {
                 $this->produceEvent(new DomainNamesRemoved($domainName->getContainerName(), [$domainName->getName()]));
             }
         }

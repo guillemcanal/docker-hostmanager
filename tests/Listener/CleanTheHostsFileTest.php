@@ -32,7 +32,7 @@ class CleanTheHostsFileTest extends TestCase
         $hostsFileManager->getDomainNames()->willReturn([$aDomainNamesFromHostsFile]);
 
         $listener = new CleanTheHostsFile($hostsFileManager->reveal());
-        $listener->subscription()->handle(new ContainerListReceived('bar.domain.fr'));
+        $listener->subscription()->handle(new ContainerListReceived('existing-container'));
 
         $producedEvents = $listener->producedEvents();
 
@@ -40,5 +40,21 @@ class CleanTheHostsFileTest extends TestCase
         assertThat(current($producedEvents), isInstanceOf(DomainNamesRemoved::class));
         assertThat(current($producedEvents)->getContainerName(), equalTo('unexisting-container'));
         assertThat(current($producedEvents)->getDomainNames(), equalTo(['foo.domain.fr']));
+    }
+
+    /** @test */
+    public function it preserve a container domain name if is listed in the container list()
+    {
+        $aDomainNamesFromHostsFile = new DomainName('foo.domain.fr', 'existing-container');
+
+        $hostsFileManager = $this->prophesize(HostsFileManager::class);
+        $hostsFileManager->getDomainNames()->willReturn([$aDomainNamesFromHostsFile]);
+
+        $listener = new CleanTheHostsFile($hostsFileManager->reveal());
+        $listener->subscription()->handle(new ContainerListReceived('existing-container'));
+
+        $producedEvents = $listener->producedEvents();
+
+        assertThat($producedEvents, countOf(0));
     }
 }
