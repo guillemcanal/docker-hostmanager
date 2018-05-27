@@ -5,6 +5,7 @@ namespace ElevenLabs\DockerHostManager;
 use ElevenLabs\DockerHostManager\Cert\Subject;
 use ElevenLabs\DockerHostManager\Crypto\RsaKeyGenerator;
 use ElevenLabs\DockerHostManager\File\FileFactory;
+use ElevenLabs\DockerHostManager\File\LocalDirectory;
 use ElevenLabs\DockerHostManager\File\LocalFile;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,7 @@ class RootCertificateTest extends TestCase
     public function it can create a valid root certificate()
     {
         $rootCertificate = new RootCertificate(
-            new FileFactory(LocalFile::class, $this->rootDirectory->url()),
+            new LocalDirectory($this->rootDirectory->url()),
             new RsaKeyGenerator(),
             new Subject(
                 $organizationName    = 'ACME Inc.',
@@ -52,7 +53,7 @@ class RootCertificateTest extends TestCase
     public function it save the root certificate and its key on the filesystem()
     {
         $rootCertificate = new RootCertificate(
-            new FileFactory(LocalFile::class, $this->rootDirectory->url()),
+            new LocalDirectory($this->rootDirectory->url()),
             new RsaKeyGenerator(),
             new Subject(
                 $organizationName    = 'ACME Inc.',
@@ -75,7 +76,7 @@ class RootCertificateTest extends TestCase
         $fixturesDirectory = __DIR__ . '/Fixtures/root-ca';
 
         $rootCertificate = new RootCertificate(
-            new FileFactory(LocalFile::class, $fixturesDirectory),
+            new LocalDirectory($fixturesDirectory),
             new RsaKeyGenerator(),
             new Subject(
                 $organizationName    = 'ACME Inc.',

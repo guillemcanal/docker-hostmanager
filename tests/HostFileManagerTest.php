@@ -2,40 +2,90 @@
 
 namespace ElevenLabs\DockerHostManager;
 
-use ElevenLabs\DockerHostManager\File\InMemoryFile;
+use ElevenLabs\DockerHostManager\File\File;
+use ElevenLabs\DockerHostManager\File\LocalFile;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\TestCase;
 
 class HostFileManagerTest extends TestCase
 {
+    private $rootDirectory;
+
+    public function setUp()
+    {
+        $this->rootDirectory = vfsStream::setup('etc');
+    }
+
+    private function getHostsFile(): File
+    {
+        return LocalFile::get($this->rootDirectory->url() . '/hosts');
+    }
+
     /** @test */
     public function it throw an exception when the hosts file cannot be found()
     {
         $this->expectException(\UnexpectedValueException::class);
-        new HostsFileManager(new InMemoryFile('', $shouldExists = false));
+
+        new HostsFileManager($this->getHostsFile());
     }
 
     /** @test */
     public function it should create a docker stack fenced block if not present in a hosts file()
     {
-        $actualContent = implode("\n",
-            [
-                '127.0.0.1 localhost localdomain',
-            ]
-        );
+        $actualContent = '127.0.0.1 localhost';
         $expectedContent = implode("\n",
             [
-                '127.0.0.1 localhost localdomain',
+                '127.0.0.1 localhost',
                 '#<docker-stack>',
                 '#</docker-stack>',
-                ''
             ]
         );
 
-        $hostsFile = new InMemoryFile($actualContent);
+        $this->addHostsFile($actualContent);
 
-        new HostsFileManager($hostsFile);
+        new HostsFileManager($this->getHostsFile());
 
-        assertThat($hostsFile->read(), equalTo($expectedContent));
+        assertThat($this->getHostsFile()->read(), equalTo($expectedContent));
+    }
+
+    /**
+     * @test
+     * @dataProvider getHostsFilesWithAnEmptyFencedBlocks
+     */
+    public function it does not provide any domain names when the fenced block(string $hostsFileContent)
+    {
+        $this->addHostsFile($hostsFileContent);
+
+        $hostsFileManager = new HostsFileManager($this->getHostsFile());
+
+        assertThat($hostsFileManager->getDomainNames(), isEmpty());
+    }
+
+    public function getHostsFilesWithAnEmptyFencedBlocks(): array
+    {
+        return [
+            'is empty' => [
+                implode("\n",
+                    [
+                        '127.0.0.1 localhost',
+                        '#<docker-stack>',
+                        '#</docker-stack>',
+                    ]
+                )
+            ],
+            'contains empty lines' => [
+                implode("\n",
+                    [
+                        '127.0.0.1 localhost',
+                        '#<docker-stack>',
+                        '',
+                        '',
+                        '#</docker-stack>',
+                    ]
+                )
+            ]
+        ];
     }
 
     /** @test */
@@ -43,18 +93,28 @@ class HostFileManagerTest extends TestCase
     {
         $actualContent = implode("\n",
             [
-                '127.0.0.1 localhost localdomain',
+                '127.0.0.1 localhost',
                 '#<docker-stack>',
-                '127.0.0.1 dev.foo.fr',
-                '127.0.0.1 dev.bar.fr',
+                '127.0.0.1 dev.foo.fr #foo',
+                '127.0.0.1 dev.bar.fr #bar',
                 '#</docker-stack>',
             ]
         );
 
-        $hostFileManager = new HostsFileManager(new InMemoryFile($actualContent));
+        $this->addHostsFile($actualContent);
 
-        assertTrue($hostFileManager->hasDomainName('dev.foo.fr'));
-        assertTrue($hostFileManager->hasDomainName('dev.bar.fr'));
+        $hostFileManager = new HostsFileManager($this->getHostsFile());
+
+        assertThat(
+            $hostFileManager->getDomainNames(),
+            equalTo(
+                [
+                    (new DomainName('dev.foo.fr', 'foo'))->withIpv4('127.0.0.1'),
+                    (new DomainName('dev.bar.fr', 'bar'))->withIpv4('127.0.0.1')
+                ]
+            )
+        );
+
     }
 
     /** @test */
@@ -62,32 +122,55 @@ class HostFileManagerTest extends TestCase
     {
         $actualContent = implode("\n",
             [
-                '127.0.0.1 localhost localdomain',
+                '127.0.0.1 localhost',
                 '#<docker-stack>',
-                '127.0.0.1 dev.foo.fr',
-                '127.0.0.1 dev.bar.fr',
+                '127.0.0.1 dev.foo.fr #foo',
+                '127.0.0.1 dev.bar.fr #bar',
                 '#</docker-stack>',
             ]
         );
         $expectedContent = implode("\n",
             [
-                '127.0.0.1 localhost localdomain',
+                '127.0.0.1 localhost',
                 '#<docker-stack>',
-                '127.0.0.1 dev.foo.fr',
-                '127.0.0.1 dev.bar.fr',
-                '127.0.0.1 dev.baz.fr',
+                '127.0.0.1 dev.foo.fr #foo',
+                '127.0.0.1 dev.bar.fr #bar',
+                '127.0.0.1 dev.baz.fr #baz',
                 '#</docker-stack>',
             ]
         );
 
-        $hostsFile = new InMemoryFile($actualContent);
+        $this->addHostsFile($actualContent);
+        $hostsFile = $this->getHostsFile();
+        $expectedDomainName = new DomainName('dev.baz.fr', 'baz');
 
         $hostsFileManager = new HostsFileManager($hostsFile);
-        $hostsFileManager->addDomainName('dev.baz.fr');
+        $hostsFileManager->addDomainName($expectedDomainName);
         $hostsFileManager->updateHostsFile();
 
-        assertTrue($hostsFileManager->hasDomainName('dev.baz.fr'));
+        assertTrue($hostsFileManager->hasDomainName($expectedDomainName));
         assertThat($hostsFile->read(), equalTo($expectedContent));
+    }
+
+    /** @test */
+    public function it throw an exception when trying to add a domain name that already exist()
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Domain name dev.foo.fr is already associated with foo');
+
+        $actualContent = implode("\n",
+            [
+                '127.0.0.1 localhost',
+                '#<docker-stack>',
+                '127.0.0.1 dev.foo.fr #foo',
+                '#</docker-stack>',
+            ]
+        );
+
+        $this->addHostsFile($actualContent);
+
+        $hostsFileManager = new HostsFileManager($this->getHostsFile());
+        $hostsFileManager->addDomainName(new DomainName('dev.foo.fr', 'something'));
     }
 
     /** @test */
@@ -95,77 +178,59 @@ class HostFileManagerTest extends TestCase
     {
         $actualContent = implode("\n",
             [
-                '127.0.0.1 localhost localdomain',
+                '127.0.0.1 localhost',
                 '#<docker-stack>',
-                '127.0.0.1 dev.foo.fr',
-                '127.0.0.1 dev.bar.fr',
+                '127.0.0.1 dev.foo.fr #foo',
+                '127.0.0.1 dev.bar.fr #bar',
                 '#</docker-stack>',
             ]
         );
         $expectedContent = implode("\n",
             [
-                '127.0.0.1 localhost localdomain',
+                '127.0.0.1 localhost',
                 '#<docker-stack>',
-                '127.0.0.1 dev.foo.fr',
+                '127.0.0.1 dev.foo.fr #foo',
                 '#</docker-stack>',
             ]
         );
 
-        $hostsFile = new InMemoryFile($actualContent);
+        $this->addHostsFile($actualContent);
+        $hostsFile = $this->getHostsFile();
+        $domainNameToRemove = new DomainName('dev.bar.fr', 'bar');
 
         $hostsFileManager = new HostsFileManager($hostsFile);
-        $hostsFileManager->removeDomainName('dev.bar.fr');
+        $hostsFileManager->removeDomainName($domainNameToRemove);
         $hostsFileManager->updateHostsFile();
 
-        assertFalse($hostsFileManager->hasDomainName('dev.baz.fr'));
+        assertFalse($hostsFileManager->hasDomainName($domainNameToRemove));
         assertThat($hostsFile->read(), equalTo($expectedContent));
     }
 
     /** @test */
-    public function it throw an exception when it cant extract exactly one ip address and one hostname()
+    public function it throw an exception when it cant extract a domaine name()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Expected exactly one IP address and one hostname, got oups');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to parse the container domain string: invalid');
 
         $actualContent = implode("\n",
             [
-                '127.0.0.1 localhost localdomain',
+                '127.0.0.1 localhost',
                 '#<docker-stack>',
-                'oups',
+                'invalid',
                 '#</docker-stack>',
             ]
         );
 
-        new HostsFileManager(new InMemoryFile($actualContent));
+        $this->addHostsFile($actualContent);
+
+        new HostsFileManager($this->getHostsFile());
     }
 
-    /** @test */
-    public function it can clear hostnames managed by the docker stack()
+    private function addHostsFile($content = '', $permission = 0644): vfsStreamFile
     {
-        $actualContent = implode("\n",
-            [
-                '127.0.0.1 localhost localdomain',
-                '#<docker-stack>',
-                '127.0.0.1 dev.foo.fr',
-                '127.0.0.1 dev.bar.fr',
-                '#</docker-stack>',
-                '192.168.1.1 helloworld',
-            ]
-        );
+        $file = vfsStream::newFile('hosts', $permission)->withContent($content);
+        $this->rootDirectory->addChild($file);
 
-        $expectedContent = implode("\n",
-            [
-                '127.0.0.1 localhost localdomain',
-                '#<docker-stack>',
-                '#</docker-stack>',
-                '192.168.1.1 helloworld',
-            ]
-        );
-
-        $file = new InMemoryFile($actualContent);
-        $hostsFileManager = new HostsFileManager($file);
-        $hostsFileManager->clear();
-
-        assertThat($file->read(), equalTo($expectedContent));
+        return $file;
     }
 }

@@ -7,8 +7,9 @@ namespace ElevenLabs\DockerHostManager;
 use ElevenLabs\DockerHostManager\Cert\CertificateBundle;
 use ElevenLabs\DockerHostManager\Cert\Subject;
 use ElevenLabs\DockerHostManager\Crypto\RsaKeyGenerator;
+use ElevenLabs\DockerHostManager\File\Directory;
 use ElevenLabs\DockerHostManager\File\FileFactory;
-use ElevenLabs\DockerHostManager\File\FileHandler;
+use ElevenLabs\DockerHostManager\File\File;
 use Sop\CryptoEncoding\PEM;
 use Sop\CryptoTypes\AlgorithmIdentifier\Feature\SignatureAlgorithmIdentifier;
 use Sop\CryptoTypes\AlgorithmIdentifier\Hash\SHA256AlgorithmIdentifier;
@@ -31,24 +32,24 @@ use X509\Certificate\Validity;
 
 class RootCertificate
 {
-    private $fileFactory;
+    private $directory;
     private $rsaKeyGenerator;
     private $subject;
 
     public function __construct(
-        FileFactory $fileFactory,
+        Directory $directory,
         RsaKeyGenerator $rsaKeyGenerator,
         Subject $subject
     ) {
-        $this->fileFactory = $fileFactory;
+        $this->directory = $directory;
         $this->rsaKeyGenerator = $rsaKeyGenerator;
         $this->subject = $subject;
     }
 
     public function get(): CertificateBundle
     {
-        $rootCAKey = $this->fileFactory->getFile('root-ca.key');
-        $rootCAFile = $this->fileFactory->getFile('root-ca.crt');
+        $rootCAKey = $this->directory->file('root-ca.key');
+        $rootCAFile = $this->directory->file('root-ca.crt');
         if ($rootCAFile->exists() && $rootCAKey->exists()) {
             return $this->createFromFiles($rootCAFile, $rootCAKey);
         }
@@ -61,7 +62,7 @@ class RootCertificate
         return $bundle;
     }
 
-    private function createFromFiles(FileHandler $rootCAFile, FileHandler $rootCAKey): CertificateBundle
+    private function createFromFiles(File $rootCAFile, File $rootCAKey): CertificateBundle
     {
         return new CertificateBundle(
             Certificate::fromPEM(PEM::fromString($rootCAFile->read())),

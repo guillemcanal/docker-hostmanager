@@ -33,7 +33,7 @@ class TraefikFrontendRuleTest extends TestCase
     }
 
     /** @test */
-    public function it does not provide domain names when the traefik frontend rule label does not contains an host rule()
+    public function it does not provide domain names when the traefik frontend rule does not contains an host rule()
     {
         $containerAttributes = new \ArrayObject(
             ['traefik.frontend.rule' => 'HostRegexp:{subdomain:[a-z]+}.localhost; Path:/hello']
@@ -42,4 +42,14 @@ class TraefikFrontendRuleTest extends TestCase
 
         assertFalse($traefikFrontendRule->provideDomainNames($containerAttributes));
     }
+
+    /** @test */
+    public function it does not provide domain names when the traefik frontend rule is invalid()
+    {
+        $containerAttributes = new \ArrayObject(['traefik.frontend.rule' => 'invalid']);
+        $traefikFrontendRule = new TraefikFrontendRule();
+
+        assertFalse($traefikFrontendRule->provideDomainNames($containerAttributes));
+    }
+
 }

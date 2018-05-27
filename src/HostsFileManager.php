@@ -4,35 +4,36 @@ declare(strict_types = 1);
 
 namespace ElevenLabs\DockerHostManager;
 
-use ElevenLabs\DockerHostManager\File\FileHandler;
+use ElevenLabs\DockerHostManager\File\File;
 
 class HostsFileManager
 {
-    private const HOSTS_FILE_FENCED_BLOCK_REGEX = '/#<docker-stack>\n(.+?)?(?=#<\/docker-stack>)/s';
+    private const HOSTS_FILE_FENCED_BLOCK_REGEX = '/#<docker-stack>\n(?P<domainNames>.+?)?#<\/docker-stack>/s';
 
     /** @var string */
-    private $hostIpAddress;
+    private $ipv4;
 
-    /** @var FileHandler */
+    /** @var File */
     private $hostsFile;
 
-    /** @var string[] */
-    private $hostnames = [];
+    /** @var array|DomainName[] */
+    private $domainNames = [];
 
     /**
      * @throws \UnexpectedValueException When the hosts file does not exists
      */
-    public function __construct(FileHandler $hostsFile, string $hostIpAddress = '127.0.0.1')
+    public function __construct(File $hostsFile, string $ipv4 = '127.0.0.1')
     {
         $this->hostsFile = $hostsFile;
-        $this->hostIpAddress = $hostIpAddress;
+        $this->ipv4 = $ipv4;
         if (!$this->hostsFile->exists()) {
             throw new \UnexpectedValueException('The hosts file could not be found');
         }
         if (!$this->hasDockerStackFencedBlock()) {
             $this->addDockerStackFencedBlock();
+        } else {
+            $this->parseHostsFile();
         }
-        $this->parseHostsFile();
     }
 
     private function hasDockerStackFencedBlock(): bool
@@ -42,61 +43,64 @@ class HostsFileManager
 
     private function addDockerStackFencedBlock(): void
     {
-        $this->hostsFile->put(
-            $this->hostsFile->read()
-            . "\n#<docker-stack>\n#</docker-stack>\n"
-        );
+        $this->hostsFile->put($this->hostsFile->read() . "\n#<docker-stack>\n#</docker-stack>");
     }
 
-    public function hasDomainName(string $domainName): bool
+    /**
+     * @return array|DomainName[]
+     */
+    public function getDomainNames(): array
     {
-        return \in_array($domainName, $this->hostnames, true);
+        return array_values($this->domainNames);
     }
 
-    public function addDomainName(string $domainName): void
+    public function hasDomainName(DomainName $domainName): bool
     {
-        if (!$this->hasDomainName($domainName)) {
-            $this->hostnames[] = $domainName;
-        }
+        return array_key_exists($domainName->getName(), $this->domainNames);
     }
 
-    public function clear(): void
-    {
-        if ($this->hasDockerStackFencedBlock()) {
-            $contents = preg_replace_callback(
-                self::HOSTS_FILE_FENCED_BLOCK_REGEX,
-                function () {
-                    return "#<docker-stack>\n";
-                },
-                $this->hostsFile->read()
-            );
-            $this->hostsFile->put($contents);
-        }
-    }
-
-    public function removeDomainName(string $domainName): void
+    public function addDomainName(DomainName $domainName): void
     {
         if ($this->hasDomainName($domainName)) {
-            unset($this->hostnames[array_search($domainName, $this->hostnames, true)]);
+            $existingDomainName = $this->getDomainNameByName($domainName->getName());
+            throw new \UnexpectedValueException(
+                sprintf(
+                    'Domain name %s is already associated with %s',
+                    $existingDomainName->getName(),
+                    $existingDomainName->getContainerName()
+                )
+            );
+        }
+
+        $this->domainNames[$domainName->getName()] = $domainName->withIpv4($this->ipv4);
+    }
+
+    public function removeDomainName(DomainName $domainNameToRemove): void
+    {
+        foreach ($this->domainNames as $i => $domainName) {
+            if ($domainName->equals($domainNameToRemove)) {
+                unset($this->domainNames[$i]);
+                break;
+            }
         }
     }
 
     public function updateHostsFile(): void
     {
-        $domains = implode(
-            "\n",
-                array_map(
-                function (string $domain) {
-                    return $this->hostIpAddress . ' ' . $domain;
-                },
-                $this->hostnames
-            )
+        $domainNameLines = array_map(
+            function (DomainName $domainName) {
+                return $domainName->toString();
+            },
+            $this->domainNames
         );
 
         $contents = preg_replace_callback(
             self::HOSTS_FILE_FENCED_BLOCK_REGEX,
-            function () use ($domains) {
-                return "#<docker-stack>\n" . $domains . "\n";
+            function () use ($domainNameLines) {
+                return sprintf(
+                    "#<docker-stack>\n%s\n#</docker-stack>",
+                    implode("\n", $domainNameLines)
+                );
             },
             $this->hostsFile->read()
         );
@@ -109,20 +113,21 @@ class HostsFileManager
         $contents = $this->hostsFile->read();
 
         preg_match(self::HOSTS_FILE_FENCED_BLOCK_REGEX, $contents, $matches);
-        if (!array_key_exists(1, $matches)) {
+        if (!array_key_exists('domainNames', $matches)) {
             return;
         }
 
-        $rawDomains = explode("\n", $matches[1]);
+        $rawDomains = explode("\n", $matches['domainNames']);
         foreach ($rawDomains as $rawDomain) {
-            if ($rawDomain === '' || $rawDomain[0] === '#') {
+            if ($rawDomain === '') {
                 continue;
             }
-            $matched = preg_split('/\s+/', $rawDomain);
-            if (\count($matched) !== 2) {
-                throw new \RuntimeException('Expected exactly one IP address and one hostname, got ' . $rawDomain);
-            }
-            $this->addDomainName($matched[1]);
+            $this->addDomainName(DomainName::fromString($rawDomain));
         }
+    }
+
+    public function getDomainNameByName(string $name): DomainName
+    {
+        return $this->domainNames[$name];
     }
 }

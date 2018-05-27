@@ -6,22 +6,27 @@ namespace ElevenLabs\DockerHostManager\File;
 
 use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
 use ElevenLabs\DockerHostManager\File\Exception\CouldNotWriteFile;
-use ElevenLabs\DockerHostManager\File\Exception\UnableToCreateFile;
+use Http\Message\UriFactory;
+use Psr\Http\Message\UriInterface;
 
-class LocalFile implements FileHandler
+class LocalFile implements File
 {
     /** @var string */
     private $filename;
 
     public function __construct(string $filename)
     {
+        $schemeSeparator = '://';
+        if (strpos($filename, $schemeSeparator) === false) {
+            $filename = 'file://' . $filename;
+        }
         $this->filename = $filename;
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getFile(string $path): FileHandler
+    public static function get(string $path): File
     {
         return new self($path);
     }
@@ -51,15 +56,13 @@ class LocalFile implements FileHandler
      */
     public function put(string $contents): void
     {
-        if (!$this->exists()) {
-            $this->createFileDirectory();
-        }
+        $this->ensureFileDirectory();
         if (@file_put_contents($this->filename, $contents) === false) {
             throw new CouldNotWriteFile('Could not write in file ' . $this->filename);
         }
     }
 
-    private function createFileDirectory(): void
+    private function ensureFileDirectory(): void
     {
         $dirname = \dirname($this->filename);
         if (is_dir($dirname)) {
@@ -68,6 +71,16 @@ class LocalFile implements FileHandler
         if (!mkdir($dirname, 0755, true) && !is_dir($dirname)) {
             throw new CouldNotWriteFile('Unable to create file in ' . $dirname);
         }
+    }
+
+    public function uri(): string
+    {
+        return $this->filename;
+    }
+
+    public function delete(): void
+    {
+        unlink($this->filename);
     }
 
 }

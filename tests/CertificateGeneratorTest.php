@@ -5,6 +5,7 @@ namespace ElevenLabs\DockerHostManager;
 use ElevenLabs\DockerHostManager\Cert\Subject;
 use ElevenLabs\DockerHostManager\Crypto\RsaKeyGenerator;
 use ElevenLabs\DockerHostManager\File\FileFactory;
+use ElevenLabs\DockerHostManager\File\LocalDirectory;
 use ElevenLabs\DockerHostManager\File\LocalFile;
 use PHPUnit\Framework\TestCase;
 use X509\GeneralName\GeneralName;
@@ -29,7 +30,7 @@ class CertificateGeneratorTest extends TestCase
 
         $this->issuerCertificateBundle = (
             new RootCertificate(
-                new FileFactory(LocalFile::class, __DIR__ . '/Fixtures/root-ca'),
+                new LocalDirectory(__DIR__ . '/Fixtures/root-ca'),
                 $this->rsaKeyGenerator,
                 $this->subject
             )
