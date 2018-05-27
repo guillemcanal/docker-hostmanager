@@ -57,7 +57,7 @@ class ExtractDomainNames implements EventListener, EventProducer
     {
         $containerAttributes = $event->getActor()->getAttributes();
         $containerName = $this->getContainerName($containerAttributes);
-        $domainNames = $this->extractDomainNames($containerAttributes);
+        $domainNames = $this->extractDomainNamesFromTheHostsFile($containerAttributes);
 
         if (!empty($domainNames) && $event->getAction() === 'create') {
             $this->produceEvent(new DomainNamesAdded($containerName, $domainNames));
@@ -72,7 +72,7 @@ class ExtractDomainNames implements EventListener, EventProducer
         return $containerAttributes['name'];
     }
 
-    private function extractDomainNames(\ArrayObject $containerAttributes): array
+    private function extractDomainNamesFromTheHostsFile(\ArrayObject $containerAttributes): array
     {
         $dnsNames = [];
         foreach ($this->extractors as $extractor) {
