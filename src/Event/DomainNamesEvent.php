@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager\Event;
 
 use ElevenLabs\DockerHostManager\EventDispatcher\Event;
@@ -19,7 +21,7 @@ abstract class DomainNamesEvent implements Event
     {
         return [
             'containerName' => $this->containerName,
-            'domainNames'   => $this->domainNames
+            'domainNames' => $this->domainNames,
         ];
     }
 

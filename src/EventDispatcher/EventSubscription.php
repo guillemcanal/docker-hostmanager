@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\EventDispatcher;
 
@@ -12,7 +12,7 @@ class EventSubscription
     public function __construct(string $eventClass, callable $callback)
     {
         if (!\is_a($eventClass, Event::class, true)) {
-            throw new \InvalidArgumentException($eventClass . ' does not implements ' . Event::class);
+            throw new \InvalidArgumentException($eventClass.' does not implements '.Event::class);
         }
 
         $this->eventClass = $eventClass;

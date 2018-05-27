@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager\Event;
 
 use Docker\API\Model\EventsGetResponse200;
@@ -24,7 +26,7 @@ class DockerEventReceived implements Event
     {
         return [
             'type' => $this->event->getType(),
-            'action' => $this->event->getAction()
+            'action' => $this->event->getAction(),
         ];
     }
 

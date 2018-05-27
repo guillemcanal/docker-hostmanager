@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
@@ -25,7 +25,7 @@ class CleanTheHostsFile implements EventListener, EventProducer
     {
         return new EventSubscription(
             ContainerListReceived::class,
-            function (ContainerListReceived $event) {
+            function (ContainerListReceived $event): void {
                 $this->cleanup($event->getDomainNames());
             }
         );

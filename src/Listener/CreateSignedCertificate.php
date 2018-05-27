@@ -1,17 +1,16 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
+use ElevenLabs\DockerHostManager\CertificateGenerator;
 use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
 use ElevenLabs\DockerHostManager\Event\SignedCertificateCreated;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
 use ElevenLabs\DockerHostManager\File\Directory;
-use ElevenLabs\DockerHostManager\File\FileFactory;
-use ElevenLabs\DockerHostManager\CertificateGenerator;
 
 class CreateSignedCertificate implements EventListener, EventProducer
 {
@@ -30,14 +29,14 @@ class CreateSignedCertificate implements EventListener, EventProducer
     private function handle(DomainNamesAdded $event): void
     {
         $containerName = $event->getContainerName();
-        $domainNames   = $event->getDomainNames();
+        $domainNames = $event->getDomainNames();
 
         $certificateBundle = $this->certificateGenerator->generate($domainNames);
 
-        $certFile = $this->directory->file('certs/' . $containerName . '.crt');
+        $certFile = $this->directory->file('certs/'.$containerName.'.crt');
         $certFile->put((string) $certificateBundle->getCertificate()->toPEM());
 
-        $keyFile = $this->directory->file('keys/' . $containerName . '.key');
+        $keyFile = $this->directory->file('keys/'.$containerName.'.key');
         $keyFile->put((string) $certificateBundle->getPrivateKeyInfo()->toPEM());
 
         $this->produceEvent(new SignedCertificateCreated($containerName, $domainNames, $certFile->uri(), $keyFile->uri()));
@@ -50,7 +49,7 @@ class CreateSignedCertificate implements EventListener, EventProducer
     {
         return new EventSubscription(
             DomainNamesAdded::class,
-            function (DomainNamesAdded $event) {
+            function (DomainNamesAdded $event): void {
                 $this->handle($event);
             }
         );

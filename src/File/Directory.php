@@ -1,22 +1,22 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\File;
 
 interface Directory
 {
     /**
-     * Return a directory instance
+     * Return a directory instance.
      *
      * @param string $path
      *
      * @return Directory
      */
-    public static function get(string $path): Directory;
+    public static function get(string $path): self;
 
     /**
-     * Get a file within the directory
+     * Get a file within the directory.
      *
      * @param string $path
      *
@@ -25,14 +25,14 @@ interface Directory
     public function file(string $path): File;
 
     /**
-     * Check if a directory exist
+     * Check if a directory exist.
      *
      * @return bool
      */
     public function exists(): bool;
 
     /**
-     * Return the URI of the directory
+     * Return the URI of the directory.
      *
      * @return string
      */

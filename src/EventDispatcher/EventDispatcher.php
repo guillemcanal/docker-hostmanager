@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\EventDispatcher;
 
@@ -16,7 +16,7 @@ class EventDispatcher
     public function dispatch($event): void
     {
         if (!\is_object($event)) {
-            throw new \UnexpectedValueException('The given event should be an object. Got ' . \gettype($event));
+            throw new \UnexpectedValueException('The given event should be an object. Got '.\gettype($event));
         }
 
         foreach ($this->listeners as $listener) {

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Cert;
 
@@ -8,7 +8,7 @@ use Sop\CryptoTypes\Asymmetric\PrivateKeyInfo;
 use X509\Certificate\Certificate;
 
 /**
- * Provide a certificate and its private key
+ * Provide a certificate and its private key.
  */
 class CertificateBundle
 {

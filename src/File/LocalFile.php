@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\File;
 
-use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
 use ElevenLabs\DockerHostManager\File\Exception\CouldNotWriteFile;
-use Http\Message\UriFactory;
-use Psr\Http\Message\UriInterface;
+use ElevenLabs\DockerHostManager\File\Exception\FileDoesNotExist;
 
 class LocalFile implements File
 {
@@ -17,8 +15,8 @@ class LocalFile implements File
     public function __construct(string $filename)
     {
         $schemeSeparator = '://';
-        if (strpos($filename, $schemeSeparator) === false) {
-            $filename = 'file://' . $filename;
+        if (false === \strpos($filename, $schemeSeparator)) {
+            $filename = 'file://'.$filename;
         }
         $this->filename = $filename;
     }
@@ -36,7 +34,7 @@ class LocalFile implements File
      */
     public function exists(): bool
     {
-        return file_exists($this->filename);
+        return \file_exists($this->filename);
     }
 
     /**
@@ -45,10 +43,10 @@ class LocalFile implements File
     public function read(): string
     {
         if (!$this->exists()) {
-            throw new FileDoesNotExist('Could not find file at ' . $this->filename);
+            throw new FileDoesNotExist('Could not find file at '.$this->filename);
         }
 
-        return file_get_contents($this->filename);
+        return \file_get_contents($this->filename);
     }
 
     /**
@@ -57,19 +55,19 @@ class LocalFile implements File
     public function put(string $contents): void
     {
         $this->ensureFileDirectory();
-        if (@file_put_contents($this->filename, $contents) === false) {
-            throw new CouldNotWriteFile('Could not write in file ' . $this->filename);
+        if (false === @\file_put_contents($this->filename, $contents)) {
+            throw new CouldNotWriteFile('Could not write in file '.$this->filename);
         }
     }
 
     private function ensureFileDirectory(): void
     {
         $dirname = \dirname($this->filename);
-        if (is_dir($dirname)) {
+        if (\is_dir($dirname)) {
             return;
         }
-        if (!mkdir($dirname, 0755, true) && !is_dir($dirname)) {
-            throw new CouldNotWriteFile('Unable to create file in ' . $dirname);
+        if (!\mkdir($dirname, 0755, true) && !\is_dir($dirname)) {
+            throw new CouldNotWriteFile('Unable to create file in '.$dirname);
         }
     }
 
@@ -80,7 +78,6 @@ class LocalFile implements File
 
     public function delete(): void
     {
-        unlink($this->filename);
+        \unlink($this->filename);
     }
-
 }

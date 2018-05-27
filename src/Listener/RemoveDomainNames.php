@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
@@ -31,7 +31,7 @@ class RemoveDomainNames implements EventListener
     {
         return new EventSubscription(
             DomainNamesRemoved::class,
-            function (DomainNamesRemoved $event) {
+            function (DomainNamesRemoved $event): void {
                 $this->handle($event);
             }
         );

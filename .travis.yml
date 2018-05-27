@@ -7,10 +7,15 @@ addons:
   sonarcloud:
     organization: "guillemcanal-github"
 
-install: composer install
+before_install:
+  - phpenv config-rm xdebug.ini
 
-script: 
-  - vendor/bin/phpunit --testdox --log-junit build/phpunit.xml --coverage-clover build/phpunit.coverage.xml --coverage-text
+install:
+  - composer install
+
+script:
+  - composer lint
+  - composer test-ci
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f build/phpunit.coverage.xml

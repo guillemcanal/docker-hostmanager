@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager\Event;
 
 use ElevenLabs\DockerHostManager\EventDispatcher\Event;
@@ -24,19 +27,19 @@ class SignedCertificateCreated implements Event
     public function toArray(): array
     {
         return [
-            'containerName'  => $this->containerName,
-            'domainNames'    => $this->domainNames,
+            'containerName' => $this->containerName,
+            'domainNames' => $this->domainNames,
             'certificateUri' => $this->certificateUri,
-            'privateKeyUri'  => $this->privateKeyUri,
+            'privateKeyUri' => $this->privateKeyUri,
         ];
     }
 
     public function __construct(string $containerName, array $domainNames, string $certificateUri, string $privateKeyUri)
     {
-        $this->containerName  = $containerName;
-        $this->domainNames    = $domainNames;
+        $this->containerName = $containerName;
+        $this->domainNames = $domainNames;
         $this->certificateUri = $certificateUri;
-        $this->privateKeyUri  = $privateKeyUri;
+        $this->privateKeyUri = $privateKeyUri;
     }
 
     public function getContainerName(): string

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Event;
 
@@ -24,7 +24,7 @@ class SignedCertificateRemoved implements Event
     public function toArray(): array
     {
         return [
-            'containerName'  => $this->containerName,
+            'containerName' => $this->containerName,
         ];
     }
 

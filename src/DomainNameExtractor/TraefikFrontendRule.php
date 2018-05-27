@@ -1,25 +1,25 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\DomainNameExtractor;
 
 /**
- * Extract domain names from the `traefik.frontend.rule` Traefik Docker label
+ * Extract domain names from the `traefik.frontend.rule` Traefik Docker label.
  */
 class TraefikFrontendRule implements DomainNameExtractor
 {
-    const TRAEFIK_FRONTEND_RULE = 'traefik.frontend.rule';
+    public const TRAEFIK_FRONTEND_RULE = 'traefik.frontend.rule';
 
     private $domainNames = [];
 
     public function provideDomainNames(\ArrayObject $attributes): bool
     {
-        if (!array_key_exists(self::TRAEFIK_FRONTEND_RULE, $attributes)) {
+        if (!\array_key_exists(self::TRAEFIK_FRONTEND_RULE, $attributes)) {
             return false;
         }
         $parsedFrontendRules = $this->parseFrontendRules($attributes[self::TRAEFIK_FRONTEND_RULE]);
-        if (!array_key_exists('Host', $parsedFrontendRules)) {
+        if (!\array_key_exists('Host', $parsedFrontendRules)) {
             return false;
         }
 
@@ -36,16 +36,16 @@ class TraefikFrontendRule implements DomainNameExtractor
     private function parseFrontendRules(string $frontEndRulesString): array
     {
         $frontEndRules = [];
-        $sections = explode(';', $frontEndRulesString);
+        $sections = \explode(';', $frontEndRulesString);
         foreach ($sections as $section) {
-            $parts = explode(':', $section);
-            $key    = trim($parts[0]);
+            $parts = \explode(':', $section);
+            $key = \trim($parts[0]);
 
-            $values = array_map(
+            $values = \array_map(
                 function (string $value) {
-                    return trim($value);
+                    return \trim($value);
                 },
-                explode(',', $parts[1] ?? '')
+                \explode(',', $parts[1] ?? '')
             );
             $frontEndRules[$key] = $values;
         }
