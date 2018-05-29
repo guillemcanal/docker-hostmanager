@@ -23,10 +23,11 @@ class CreateTraefikTlsConfiguration implements EventListener, EventProducer
         $this->directory = $directory;
     }
 
-    public function subscription(): EventSubscription {
+    public function subscription(): EventSubscription
+    {
         return new EventSubscription(
             SignedCertificateCreated::class,
-            function (SignedCertificateCreated $event) {
+            function (SignedCertificateCreated $event): void {
                 $this->createTlsConfiguration($event);
             }
         );
@@ -46,7 +47,7 @@ class CreateTraefikTlsConfiguration implements EventListener, EventProducer
 TOML;
 
         $traefikConfDirectory = $this->directory->directory(EnsureThatTraefikIsRunning::TRAEFIK_CONF_DIRECTORY);
-        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName() . '.toml');
+        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName().'.toml');
         $containerTlsConfigFile->put($tomlConfig);
 
         $this->produceEvent(new TraefikTlsConfigurationCreated($event->getContainerName()));

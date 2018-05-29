@@ -23,7 +23,8 @@ class RemoveTraefikTlsConfiguration implements EventListener, EventProducer
         $this->directory = $directory;
     }
 
-    public function subscription(): EventSubscription {
+    public function subscription(): EventSubscription
+    {
         return new EventSubscription(
             SignedCertificateRemoved::class,
             function (SignedCertificateRemoved $event): void {
@@ -35,11 +36,10 @@ class RemoveTraefikTlsConfiguration implements EventListener, EventProducer
     public function removeTlsConfiguration(SignedCertificateRemoved $event): void
     {
         $traefikConfDirectory = $this->directory->directory(EnsureThatTraefikIsRunning::TRAEFIK_CONF_DIRECTORY);
-        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName() . '.toml');
+        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName().'.toml');
         if ($containerTlsConfigFile->exists()) {
             $containerTlsConfigFile->delete();
             $this->produceEvent(new TraefikTlsConfigurationRemoved($event->getContainerName()));
         }
     }
 }
-

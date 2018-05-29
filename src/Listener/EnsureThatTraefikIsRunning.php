@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use Docker\API\Exception\ImageInspectNotFoundException;
 use Docker\API\Model\ContainersCreatePostBody;
-use Docker\API\Model\CreateImageInfo;
 use Docker\API\Model\HostConfig;
 use Docker\API\Model\PortBinding;
 use Docker\Docker;
@@ -41,7 +42,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
     {
         return new EventSubscription(
             ApplicationStarted::class,
-            function () {
+            function (): void {
                 $this->check();
             }
         );
@@ -52,7 +53,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
         $containerList = $this->docker->containerList(
             [
                 'all' => true,
-                'filters' => json_encode(['name' => [self::TRAEFIK_CONTAINER_NAME]])
+                'filters' => \json_encode(['name' => [self::TRAEFIK_CONTAINER_NAME]]),
             ]
         );
 
@@ -65,7 +66,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
 
         // @todo Check that the existing traefik container is properly configured and use the proper traefik version
         $traefikContainer = \current($containerList);
-        if ($traefikContainer->getState() === 'exited') {
+        if ('exited' === $traefikContainer->getState()) {
             $this->startTraefikContainer($traefikContainer->getId());
         }
     }
@@ -80,19 +81,19 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
             ->setExposedPorts(
                 new \ArrayObject(
                     [
-                        '80/tcp'    => new \ArrayObject(),
-                        '8080/tcp'    => new \ArrayObject(),
-                        '443/tcp'   => new \ArrayObject()
+                        '80/tcp' => new \ArrayObject(),
+                        '8080/tcp' => new \ArrayObject(),
+                        '443/tcp' => new \ArrayObject(),
                     ]
                 )
             )
             ->setLabels(
                 new \ArrayObject(
                     [
-                        'traefik.enable'        => 'true',
-                        'traefik.backend'       => 'traefik',
-                        'traefik.port'          => '8080',
-                        'traefik.frontend.rule' => 'Host: traefik.docker'
+                        'traefik.enable' => 'true',
+                        'traefik.backend' => 'traefik',
+                        'traefik.port' => '8080',
+                        'traefik.frontend.rule' => 'Host: traefik.docker',
                     ]
                 )
             )
@@ -100,17 +101,17 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                 ->setPortBindings(
                     new \ArrayObject(
                         [
-                            '80/tcp'   => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('80')],
+                            '80/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('80')],
                             '8080/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('8080')],
-                            '443/tcp'  => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('443')]
+                            '443/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('443')],
                         ]
                     )
                 )
                 ->setBinds(
                     [
-                        /** @todo the docker volume name is provided by the user. find a proper solution to get the volume name  */
+                        /* @todo the docker volume name is provided by the user. find a proper solution to get the volume name  */
                         'docker-hostmanager-data:/data:rw',
-                        '/var/run/docker.sock:/var/run/docker.sock:ro'
+                        '/var/run/docker.sock:/var/run/docker.sock:ro',
                     ]
                 )
             )
@@ -121,11 +122,11 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                     '--entryPoints=Name:https Address::443 TLS',
                     '--web',
                     '--file',
-                    '--file.directory=/data/' . self::TRAEFIK_CONF_DIRECTORY,
+                    '--file.directory=/data/'.self::TRAEFIK_CONF_DIRECTORY,
                     '--docker',
                     '--docker.watch=true',
                     '--docker.exposedByDefault=false',
-                    '--logLevel=INFO'
+                    '--logLevel=INFO',
                 ]
             );
 
@@ -147,7 +148,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
     private function pullTraefikImage(): void
     {
         try {
-            $this->docker->imageInspect('traefik:' . self::TRAEFIK_VERSION);
+            $this->docker->imageInspect('traefik:'.self::TRAEFIK_VERSION);
         } catch (ImageInspectNotFoundException $e) {
             /** @var CreateImageStream $createImageStream */
             $createImageStream = $this->docker->imageCreate(
@@ -155,7 +156,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                 ['fromImage' => 'traefik', 'tag' => self::TRAEFIK_VERSION]
             );
             $createImageStream->wait();
-            $this->produceEvent(new EventProcessed('pulled traefik image ' . self::TRAEFIK_VERSION));
+            $this->produceEvent(new EventProcessed('pulled traefik image '.self::TRAEFIK_VERSION));
         }
     }
 

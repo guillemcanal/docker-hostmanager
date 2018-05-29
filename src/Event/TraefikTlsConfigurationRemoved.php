@@ -28,7 +28,7 @@ class TraefikTlsConfigurationRemoved implements Event
 
     public function getType(): EventType
     {
-       return new EventType(EventType::EVENT_STANDARD);
+        return new EventType(EventType::EVENT_STANDARD);
     }
 
     public function getContainerName()

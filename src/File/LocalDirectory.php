@@ -37,7 +37,7 @@ class LocalDirectory implements Directory
 
     public function create(): void
     {
-        if(!mkdir($this->dirname) && !is_dir($this->dirname)) {
+        if (!\mkdir($this->dirname) && !\is_dir($this->dirname)) {
             throw new UnableToCreateDirectory('Unable to create directory '.$this->uri());
         }
     }
@@ -56,5 +56,4 @@ class LocalDirectory implements Directory
     {
         return \parse_url($this->uri())['path'];
     }
-
 }

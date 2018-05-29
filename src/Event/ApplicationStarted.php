@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace ElevenLabs\DockerHostManager\Event;
 
 use ElevenLabs\DockerHostManager\EventDispatcher\Event;

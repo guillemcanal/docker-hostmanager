@@ -52,7 +52,8 @@ interface File
     public function uri(): string;
 
     /**
-     * Return the path of a file
+     * Return the path of a file.
+     *
      * @return string
      */
     public function path(): string;

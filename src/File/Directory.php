@@ -28,9 +28,10 @@ interface Directory
      * Get a directory within the directory.
      *
      * @param string $path
+     *
      * @return Directory
      */
-    public function directory(string $path): Directory;
+    public function directory(string $path): self;
 
     /**
      * Check if a directory exist.
@@ -40,7 +41,7 @@ interface Directory
     public function exists(): bool;
 
     /**
-     * Create the directory
+     * Create the directory.
      */
     public function create(): void;
 
@@ -52,7 +53,8 @@ interface Directory
     public function uri(): string;
 
     /**
-     * Return the path of a directory
+     * Return the path of a directory.
+     *
      * @return string
      */
     public function path(): string;

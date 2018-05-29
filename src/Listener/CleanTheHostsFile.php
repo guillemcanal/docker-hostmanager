@@ -7,8 +7,8 @@ namespace ElevenLabs\DockerHostManager\Listener;
 use ElevenLabs\DockerHostManager\Container;
 use ElevenLabs\DockerHostManager\DomainName;
 use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
 use ElevenLabs\DockerHostManager\Event\ContainerListReceived;
+use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
 use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
@@ -23,7 +23,7 @@ class CleanTheHostsFile implements EventListener, EventProducer
     private $hostsFileManager;
     private $domainNameExtractors;
 
-    public function __construct(HostsFileManager $hostsFileManager, DomainNameExtractor...$domainNameExtractors)
+    public function __construct(HostsFileManager $hostsFileManager, DomainNameExtractor ...$domainNameExtractors)
     {
         $this->hostsFileManager = $hostsFileManager;
         $this->domainNameExtractors = $domainNameExtractors;
@@ -44,7 +44,7 @@ class CleanTheHostsFile implements EventListener, EventProducer
      */
     public function cleanup(array $containerList): void
     {
-        $containerNames = array_map(
+        $containerNames = \array_map(
             function (Container $container) {
                 return $container->getName();
             },

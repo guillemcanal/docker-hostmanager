@@ -52,7 +52,7 @@ class CertificateGenerator
 
     public function generate(array $dnsNames): CertificateBundle
     {
-        $commonName = current($dnsNames);
+        $commonName = \current($dnsNames);
         $privateKeyInfo = $this->getPrivateKeyInfo();
 
         $certificationRequestInfo = $this->getCertificationRequestInfo(

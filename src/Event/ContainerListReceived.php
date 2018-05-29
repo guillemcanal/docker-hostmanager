@@ -25,7 +25,7 @@ class ContainerListReceived implements Event
 
     public function toArray(): array
     {
-        return ['containerList' => array_map(
+        return ['containerList' => \array_map(
             function (Container $container) {
                 return $container->getName();
             },

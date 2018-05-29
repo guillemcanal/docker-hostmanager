@@ -8,7 +8,6 @@ use Docker\API\Model\EventsGetResponse200;
 use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
 use ElevenLabs\DockerHostManager\Event\DockerEventReceived;
 use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
-use ElevenLabs\DockerHostManager\Event\DomainNamesEvent;
 use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
