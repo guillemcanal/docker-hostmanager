@@ -7,15 +7,18 @@ namespace ElevenLabs\DockerHostManager\Listener;
 use ElevenLabs\DockerHostManager\DomainName;
 use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
 use ElevenLabs\DockerHostManager\Event\ErrorReceived;
+use ElevenLabs\DockerHostManager\Event\EventProcessed;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
+use ElevenLabs\DockerHostManager\EventDispatcher\EventProducerTrait;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
 use ElevenLabs\DockerHostManager\HostsFileManager;
 
 class AddDomainNames implements EventListener, EventProducer
 {
+    use EventProducerTrait;
+
     private $hostsFileManager;
-    private $producedEvents = [];
 
     public function __construct(HostsFileManager $hostsFileManager)
     {
@@ -41,7 +44,9 @@ class AddDomainNames implements EventListener, EventProducer
                 );
             }
         }
+
         $this->hostsFileManager->updateHostsFile();
+        $this->produceEvent(new EventProcessed('Added domain names in the host file'));
     }
 
     public function subscription(): EventSubscription
@@ -52,18 +57,5 @@ class AddDomainNames implements EventListener, EventProducer
                 $this->handle($event);
             }
         );
-    }
-
-    public function producedEvents(): array
-    {
-        $events = $this->producedEvents;
-        $this->producedEvents = [];
-
-        return $events;
-    }
-
-    private function produceEvent($event): void
-    {
-        $this->producedEvents[] = $event;
     }
 }

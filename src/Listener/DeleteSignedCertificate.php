@@ -8,13 +8,15 @@ use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
 use ElevenLabs\DockerHostManager\Event\SignedCertificateRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
+use ElevenLabs\DockerHostManager\EventDispatcher\EventProducerTrait;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
 use ElevenLabs\DockerHostManager\File\Directory;
 
 class DeleteSignedCertificate implements EventListener, EventProducer
 {
+    use EventProducerTrait;
+
     private $directory;
-    private $producedEvents = [];
 
     public function __construct(Directory $directory)
     {
@@ -47,18 +49,5 @@ class DeleteSignedCertificate implements EventListener, EventProducer
                 $this->handle($event);
             }
         );
-    }
-
-    public function producedEvents(): array
-    {
-        $events = $this->producedEvents;
-        $this->producedEvents = [];
-
-        return $events;
-    }
-
-    private function produceEvent(SignedCertificateRemoved $event): void
-    {
-        $this->producedEvents[] = $event;
     }
 }

@@ -52,7 +52,7 @@ class CertificateGenerator
 
     public function generate(array $dnsNames): CertificateBundle
     {
-        $commonName = \array_shift($dnsNames);
+        $commonName = current($dnsNames);
         $privateKeyInfo = $this->getPrivateKeyInfo();
 
         $certificationRequestInfo = $this->getCertificationRequestInfo(
@@ -99,29 +99,30 @@ class CertificateGenerator
     ): CertificationRequestInfo {
         $certificateRequestInfo = new CertificationRequestInfo($subject, $publicKeyInfo);
 
-        return $certificateRequestInfo->withExtensionRequest(
-            new Extensions(
-                new KeyUsageExtension(
-                    true,
-                    KeyUsageExtension::DIGITAL_SIGNATURE
-                    | KeyUsageExtension::NON_REPUDIATION
-                    | KeyUsageExtension::KEY_ENCIPHERMENT
-                    | KeyUsageExtension::DATA_ENCIPHERMENT
-                ),
-                new BasicConstraintsExtension(true, false),
-                new SubjectAlternativeNameExtension(
-                    false,
-                    new GeneralNames(
-                        ...\array_map(
-                            function (string $dnsName) {
-                                return new DNSName($dnsName);
-                            },
-                            $dnsNames
+        return $certificateRequestInfo
+            ->withExtensionRequest(
+                new Extensions(
+                    new KeyUsageExtension(
+                        true,
+                        KeyUsageExtension::DIGITAL_SIGNATURE
+                        | KeyUsageExtension::NON_REPUDIATION
+                        | KeyUsageExtension::KEY_ENCIPHERMENT
+                        | KeyUsageExtension::DATA_ENCIPHERMENT
+                    ),
+                    new BasicConstraintsExtension(true, false),
+                    new SubjectAlternativeNameExtension(
+                        false,
+                        new GeneralNames(
+                            ...\array_map(
+                                function (string $dnsName) {
+                                    return new DNSName($dnsName);
+                                },
+                                $dnsNames
+                            )
                         )
                     )
                 )
-            )
-        );
+            );
     }
 
     private function getTBSCertificate(CertificationRequest $csr): TBSCertificate

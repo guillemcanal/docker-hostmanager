@@ -76,6 +76,11 @@ class LocalFile implements File
         return $this->filename;
     }
 
+    public function path(): string
+    {
+        return \parse_url($this->filename)['path'];
+    }
+
     public function delete(): void
     {
         \unlink($this->filename);

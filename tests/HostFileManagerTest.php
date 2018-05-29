@@ -37,8 +37,8 @@ class HostFileManagerTest extends TestCase
         $expectedContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
-                '#</docker-stack>',
+                '#<docker-hostmanager>',
+                '#</docker-hostmanager>',
             ]
         );
 
@@ -69,8 +69,8 @@ class HostFileManagerTest extends TestCase
                 implode("\n",
                     [
                         '127.0.0.1 localhost',
-                        '#<docker-stack>',
-                        '#</docker-stack>',
+                        '#<docker-hostmanager>',
+                        '#</docker-hostmanager>',
                     ]
                 )
             ],
@@ -78,10 +78,10 @@ class HostFileManagerTest extends TestCase
                 implode("\n",
                     [
                         '127.0.0.1 localhost',
-                        '#<docker-stack>',
+                        '#<docker-hostmanager>',
                         '',
                         '',
-                        '#</docker-stack>',
+                        '#</docker-hostmanager>',
                     ]
                 )
             ]
@@ -94,10 +94,10 @@ class HostFileManagerTest extends TestCase
         $actualContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
+                '#<docker-hostmanager>',
                 '127.0.0.1 dev.foo.fr #foo',
                 '127.0.0.1 dev.bar.fr #bar',
-                '#</docker-stack>',
+                '#</docker-hostmanager>',
             ]
         );
 
@@ -123,20 +123,20 @@ class HostFileManagerTest extends TestCase
         $actualContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
+                '#<docker-hostmanager>',
                 '127.0.0.1 dev.foo.fr #foo',
                 '127.0.0.1 dev.bar.fr #bar',
-                '#</docker-stack>',
+                '#</docker-hostmanager>',
             ]
         );
         $expectedContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
+                '#<docker-hostmanager>',
                 '127.0.0.1 dev.foo.fr #foo',
                 '127.0.0.1 dev.bar.fr #bar',
                 '127.0.0.1 dev.baz.fr #baz',
-                '#</docker-stack>',
+                '#</docker-hostmanager>',
             ]
         );
 
@@ -161,9 +161,9 @@ class HostFileManagerTest extends TestCase
         $actualContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
+                '#<docker-hostmanager>',
                 '127.0.0.1 dev.foo.fr #foo',
-                '#</docker-stack>',
+                '#</docker-hostmanager>',
             ]
         );
 
@@ -179,18 +179,18 @@ class HostFileManagerTest extends TestCase
         $actualContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
+                '#<docker-hostmanager>',
                 '127.0.0.1 dev.foo.fr #foo',
                 '127.0.0.1 dev.bar.fr #bar',
-                '#</docker-stack>',
+                '#</docker-hostmanager>',
             ]
         );
         $expectedContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
+                '#<docker-hostmanager>',
                 '127.0.0.1 dev.foo.fr #foo',
-                '#</docker-stack>',
+                '#</docker-hostmanager>',
             ]
         );
 
@@ -215,9 +215,9 @@ class HostFileManagerTest extends TestCase
         $actualContent = implode("\n",
             [
                 '127.0.0.1 localhost',
-                '#<docker-stack>',
+                '#<docker-hostmanager>',
                 'invalid',
-                '#</docker-stack>',
+                '#</docker-hostmanager>',
             ]
         );
 

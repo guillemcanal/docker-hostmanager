@@ -7,10 +7,10 @@ use Docker\API\Model\ContainerSummaryItem;
 use Docker\API\Model\EventsGetResponse200;
 use Docker\Docker;
 use Docker\Stream\EventStream;
+use ElevenLabs\DockerHostManager\Event\ApplicationStarted;
 use ElevenLabs\DockerHostManager\Event\ContainerListReceived;
 use ElevenLabs\DockerHostManager\Event\DockerEventReceived;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventDispatcher;
-use ElevenLabs\DockerHostManager\Listener\DockerEvent;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -31,10 +31,11 @@ class DockerEventsTest extends TestCase
         );
 
         $docker = $this->prophesize(Docker::class);
-        $docker->systemEvents()->willReturn($eventStream);
+        $docker->systemEvents(Argument::any())->willReturn($eventStream);
         $docker->containerList()->willReturn([]);
 
         $dispatcher = $this->prophesize(EventDispatcher::class);
+        $dispatcher->dispatch(new ApplicationStarted())->shouldBeCalledTimes(1);
         $dispatcher->dispatch(new DockerEventReceived($dockerEvent))->shouldBeCalledTimes(1);
 
         $dockerEvents = new DockerEvents($docker->reveal(), $dispatcher->reveal());
@@ -51,11 +52,12 @@ class DockerEventsTest extends TestCase
         $eventStream->onFrame(Argument::type(Closure::class));
 
         $docker = $this->prophesize(Docker::class);
-        $docker->systemEvents()->willReturn($eventStream);
+        $docker->systemEvents(Argument::any())->willReturn($eventStream);
         $docker->containerList()->willReturn($containerList);
 
         $dispatcher = $this->prophesize(EventDispatcher::class);
-        $dispatcher->dispatch(new ContainerListReceived('test-container'))->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(new ApplicationStarted())->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(new ContainerListReceived(new Container('test-container', null)))->shouldBeCalledTimes(1);
 
         $dockerEvents = new DockerEvents($docker->reveal(), $dispatcher->reveal());
         $dockerEvents->listen();

@@ -25,6 +25,14 @@ interface Directory
     public function file(string $path): File;
 
     /**
+     * Get a directory within the directory.
+     *
+     * @param string $path
+     * @return Directory
+     */
+    public function directory(string $path): Directory;
+
+    /**
      * Check if a directory exist.
      *
      * @return bool
@@ -32,9 +40,20 @@ interface Directory
     public function exists(): bool;
 
     /**
+     * Create the directory
+     */
+    public function create(): void;
+
+    /**
      * Return the URI of the directory.
      *
      * @return string
      */
     public function uri(): string;
+
+    /**
+     * Return the path of a directory
+     * @return string
+     */
+    public function path(): string;
 }

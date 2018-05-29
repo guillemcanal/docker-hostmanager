@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Event;
 
+use ElevenLabs\DockerHostManager\Container;
+use ElevenLabs\DockerHostManager\DomainName;
 use ElevenLabs\DockerHostManager\EventDispatcher\Event;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventType;
 
 class ContainerListReceived implements Event
 {
-    private $domainNames;
+    private $containerList;
 
-    public function __construct(string ...$names)
+    public function __construct(Container ...$containerList)
     {
-        $this->domainNames = $names;
+        $this->containerList = $containerList;
     }
 
     public function getName(): string
@@ -23,7 +25,12 @@ class ContainerListReceived implements Event
 
     public function toArray(): array
     {
-        return ['domainNames' => $this->domainNames];
+        return ['containerList' => array_map(
+            function (Container $container) {
+                return $container->getName();
+            },
+            $this->getContainerList()
+        )];
     }
 
     public function getType(): EventType
@@ -31,8 +38,11 @@ class ContainerListReceived implements Event
         return new EventType(EventType::EVENT_INTERNAL);
     }
 
-    public function getDomainNames(): array
+    /**
+     * @return array|DomainName[]
+     */
+    public function getContainerList(): array
     {
-        return $this->domainNames;
+        return $this->containerList;
     }
 }

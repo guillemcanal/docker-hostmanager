@@ -2,6 +2,7 @@
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
+use ElevenLabs\DockerHostManager\Container;
 use ElevenLabs\DockerHostManager\DomainName;
 use ElevenLabs\DockerHostManager\Event\ContainerListReceived;
 use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
@@ -32,7 +33,7 @@ class CleanTheHostsFileTest extends TestCase
         $hostsFileManager->getDomainNames()->willReturn([$aDomainNamesFromHostsFile]);
 
         $listener = new CleanTheHostsFile($hostsFileManager->reveal());
-        $listener->subscription()->handle(new ContainerListReceived('existing-container'));
+        $listener->subscription()->handle(new ContainerListReceived(new Container('existing-container', null)));
 
         $producedEvents = $listener->producedEvents();
 
@@ -51,7 +52,7 @@ class CleanTheHostsFileTest extends TestCase
         $hostsFileManager->getDomainNames()->willReturn([$aDomainNamesFromHostsFile]);
 
         $listener = new CleanTheHostsFile($hostsFileManager->reveal());
-        $listener->subscription()->handle(new ContainerListReceived('existing-container'));
+        $listener->subscription()->handle(new ContainerListReceived(new Container('existing-container', null)));
 
         $producedEvents = $listener->producedEvents();
 

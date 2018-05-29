@@ -48,7 +48,7 @@ class AddDomainNamesTest extends TestCase
         $producedEvents = $listener->producedEvents();
         $expectedErrorMessage = 'Unable to add domain name test.domain.fr for container test';
 
-        assertCount(1, $producedEvents);
+        assertCount(2, $producedEvents);
         assertThat(current($producedEvents), isInstanceOf(ErrorReceived::class));
         assertThat(current($producedEvents)->getMessage(), equalTo($expectedErrorMessage));
         assertThat(current($producedEvents)->getException(), equalTo($thrownException));

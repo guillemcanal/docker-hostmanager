@@ -1,0 +1,63 @@
+#!/usr/bin/env php
+<?php
+//@todo Create a proper Symfony command
+//@todo Handle POSIX signals
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+use Docker\Docker;
+use ElevenLabs\DockerHostManager;
+use ElevenLabs\DockerHostManager\{DomainNameExtractor, Listener, Crypto, Cert, File, EventDispatcher};
+use Psr\Log\LogLevel;
+
+$logger = new Monolog\Logger('docker-hostmanager');
+$logger->pushHandler(
+    new Monolog\Handler\StreamHandler(
+        'php://stdout',
+        \getenv('APP_LOG_LEVEL') ?: LogLevel::INFO
+    )
+);
+
+$dockerSocketFile = File\LocalFile::get('/var/run/docker.sock');
+if (!$dockerSocketFile->exists()) {
+    $logger->critical('Unable to find the docker socket file at /var/run/docker.sock');
+    $logger->critical('Exiting');
+    exit(2);
+}
+
+$rsaGenerator = new Crypto\RsaKeyGenerator();
+
+$subject = new Cert\Subject(
+    $organizationName  = \getenv('CERT_ORGANIZATION_NAME')      ?: 'Docker HostManager',
+    $commonName        = \getenv('CERT_COMMON_NAME')            ?: 'Docker HostManager Root CA',
+    $countryName       = \getenv('CERT_COUNTRY_NAME')           ?: 'FR',
+    $stateProvinceName = \getenv('CERT_STATE_OR_PROVINCE_NAME') ?: 'Paris',
+    $localityName      = \getenv('CERT_LOCALITY_NAME')          ?: 'Paris'
+);
+
+$dataDirectory = File\LocalDirectory::get(\getenv('DATA_PATH') ?: '/data');
+$issuerBundleCertificate = (new DockerHostManager\RootCertificate($dataDirectory, $rsaGenerator, $subject))->get();
+$certificateGenerator = new DockerHostManager\CertificateGenerator($subject, $rsaGenerator, $issuerBundleCertificate);
+
+$hostsFileManager = new DockerHostManager\HostsFileManager(
+    File\LocalFile::get(
+        \getenv('APP_HOSTS_PATH') ?: '/hosts/etc/hosts'
+    )
+);
+
+$dockerClient = Docker::create();
+
+$eventDispatcher = new EventDispatcher\EventDispatcher(
+    new Listener\LogEvents($logger),
+    new Listener\EnsureThatTraefikIsRunning($dockerClient, $dataDirectory),
+    new Listener\CleanTheHostsFile($hostsFileManager, new DomainNameExtractor\TraefikFrontendRule()),
+    new Listener\ExtractDomainNames(new DomainNameExtractor\TraefikFrontendRule()),
+    new Listener\AddDomainNames($hostsFileManager),
+    new Listener\RemoveDomainNames($hostsFileManager),
+    new Listener\CreateSignedCertificate($certificateGenerator, $dataDirectory),
+    new Listener\DeleteSignedCertificate($dataDirectory),
+    new Listener\CreateTraefikTlsConfiguration($dataDirectory),
+    new Listener\RemoveTraefikTlsConfiguration($dataDirectory)
+);
+
+// Start listening to docker events
+(new DockerHostManager\DockerEvents($dockerClient, $eventDispatcher))->listen();
