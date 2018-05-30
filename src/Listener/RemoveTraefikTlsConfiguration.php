@@ -36,7 +36,7 @@ class RemoveTraefikTlsConfiguration implements EventListener, EventProducer
     public function removeTlsConfiguration(SignedCertificateRemoved $event): void
     {
         $traefikConfDirectory = $this->directory->directory(EnsureThatTraefikIsRunning::TRAEFIK_CONF_DIRECTORY);
-        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName().'.toml');
+        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName().'.tls.toml');
         if ($containerTlsConfigFile->exists()) {
             $containerTlsConfigFile->delete();
             $this->produceEvent(new TraefikTlsConfigurationRemoved($event->getContainerName()));

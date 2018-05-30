@@ -6,7 +6,7 @@ namespace ElevenLabs\DockerHostManager\DomainNameExtractor;
 
 interface DomainNameExtractor
 {
-    public function provideDomainNames(\ArrayObject $attributes): bool;
+    public function provideDomainNames(array $containerAttributes): bool;
 
-    public function getDomainNames(\ArrayObject $attributes): array;
+    public function getDomainNames(array $containerAttributes): array;
 }

@@ -23,7 +23,7 @@ class EventProcessed implements Event
 
     public function toArray(): array
     {
-        return ['message' => $this->message];
+        return ['message' => $this->getMessage()];
     }
 
     public function getType(): EventType

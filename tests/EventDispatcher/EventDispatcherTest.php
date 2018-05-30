@@ -4,7 +4,6 @@ namespace ElevenLabs\DockerHostManager\EventDispatcher;
 
 use PHPUnit\Framework\TestCase;
 
-
 class EventDispatcherTest extends TestCase
 {
     /** @test */

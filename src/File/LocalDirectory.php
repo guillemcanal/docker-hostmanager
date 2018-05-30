@@ -54,6 +54,8 @@ class LocalDirectory implements Directory
 
     public function path(): string
     {
-        return \parse_url($this->uri())['path'];
+        $parts = \explode('://', $this->uri());
+
+        return \end($parts);
     }
 }

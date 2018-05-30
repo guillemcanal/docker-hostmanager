@@ -19,7 +19,7 @@ trait EventProducerTrait
     private function produceEvent($event): void
     {
         if (!\is_object($event)) {
-            throw new \InvalidArgumentException('prodiced event should be of type object. Got '.\gettype($event));
+            throw new \InvalidArgumentException('Produced event should be of type object. Got '.\gettype($event));
         }
         $this->producedEvents[] = $event;
     }

@@ -48,8 +48,9 @@ class DockerEvents
         $names = \array_map(
             function (ContainerSummaryItem $item) {
                 $containerName = \ltrim(\current($item->getNames()), '/');
+                $containerLabels = $item->getLabels() ?: new \ArrayObject();
 
-                return new Container($containerName, $item->getLabels());
+                return new Container($containerName, \iterator_to_array($containerLabels));
             },
             $this->docker->containerList()
         );

@@ -1,8 +1,6 @@
 <?php
 
-$finder = \PhpCsFixer\Finder::create()
-    ->in([__DIR__.'/src'])
-;
+$finder = \PhpCsFixer\Finder::create()->in([__DIR__.'/src']);
 
 return \PhpCsFixer\Config::create()
     ->setRules([
@@ -28,5 +26,4 @@ return \PhpCsFixer\Config::create()
         'strict_param' => true,
     ])
     ->setRiskyAllowed(true)
-    ->setFinder($finder)
-    ;
+    ->setFinder($finder);

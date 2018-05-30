@@ -13,12 +13,12 @@ class TraefikFrontendRule implements DomainNameExtractor
 
     private $domainNames = [];
 
-    public function provideDomainNames(\ArrayObject $attributes): bool
+    public function provideDomainNames(array $containerAttributes): bool
     {
-        if (!\array_key_exists(self::TRAEFIK_FRONTEND_RULE, $attributes)) {
+        if (!\array_key_exists(self::TRAEFIK_FRONTEND_RULE, $containerAttributes)) {
             return false;
         }
-        $parsedFrontendRules = $this->parseFrontendRules($attributes[self::TRAEFIK_FRONTEND_RULE]);
+        $parsedFrontendRules = $this->parseFrontendRules($containerAttributes[self::TRAEFIK_FRONTEND_RULE]);
         if (!\array_key_exists('Host', $parsedFrontendRules)) {
             return false;
         }
@@ -28,7 +28,7 @@ class TraefikFrontendRule implements DomainNameExtractor
         return true;
     }
 
-    public function getDomainNames(\ArrayObject $attributes): array
+    public function getDomainNames(array $containerAttributes): array
     {
         return $this->domainNames;
     }

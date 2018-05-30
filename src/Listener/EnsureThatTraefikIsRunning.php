@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use Docker\API\Exception\ImageInspectNotFoundException;
+use Docker\API\Exception\NetworkInspectNotFoundException;
 use Docker\API\Model\ContainersCreatePostBody;
+use Docker\API\Model\ContainerSummaryItem;
 use Docker\API\Model\HostConfig;
+use Docker\API\Model\NetworksCreatePostBody;
+use Docker\API\Model\NetworksIdConnectPostBody;
 use Docker\API\Model\PortBinding;
 use Docker\Docker;
 use Docker\Stream\CreateImageStream;
@@ -50,32 +54,15 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
 
     private function check(): void
     {
-        $containerList = $this->docker->containerList(
-            [
-                'all' => true,
-                'filters' => \json_encode(['name' => [self::TRAEFIK_CONTAINER_NAME]]),
-            ]
-        );
-
-        if (0 === \count($containerList)) {
-            $this->pullTraefikImage();
-            $this->createTraefikContainer();
-
-            return;
-        }
-
-        // @todo Check that the existing traefik container is properly configured and use the proper traefik version
-        $traefikContainer = \current($containerList);
-        if ('exited' === $traefikContainer->getState()) {
-            $this->startTraefikContainer($traefikContainer->getId());
-        }
+        $this->ensureConfigurationDirectoryExists();
+        $this->ensureThatTheTraefikNetworkExists();
+        $this->ensureThatTheTraefikContainerExists();
+        $this->startTheTraefikContainerIfStopped();
+        $this->ensureThatTheTraefikContainerIsConnectedToTheTraefikNetwork();
     }
 
     private function createTraefikContainer(): void
     {
-        // @todo Create a specific Docker network for Traefik
-        $this->ensureThatTheTraefikConfDirectoryExists();
-
         $containerCreateBody = (new ContainersCreatePostBody())
             ->setImage('traefik:'.self::TRAEFIK_VERSION)
             ->setExposedPorts(
@@ -102,7 +89,6 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                     new \ArrayObject(
                         [
                             '80/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('80')],
-                            '8080/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('8080')],
                             '443/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('443')],
                         ]
                     )
@@ -130,12 +116,11 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                 ]
             );
 
-        $containerCreatedResponse = $this->docker->containerCreate(
+        $this->docker->containerCreate(
             $containerCreateBody,
             ['name' => self::TRAEFIK_CONTAINER_NAME]
         );
 
-        $this->startTraefikContainer($containerCreatedResponse->getId());
         $this->produceEvent(new EventProcessed('traefik container created'));
     }
 
@@ -160,12 +145,81 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
         }
     }
 
-    private function ensureThatTheTraefikConfDirectoryExists(): void
+    private function ensureConfigurationDirectoryExists(): void
     {
         $traefikConfDirectory = $this->directory->directory(self::TRAEFIK_CONF_DIRECTORY);
         if (!$traefikConfDirectory->exists()) {
             $traefikConfDirectory->create();
             $this->produceEvent(new EventProcessed('traefik tls config directory created'));
         }
+    }
+
+    private function ensureThatTheTraefikNetworkExists(): void
+    {
+        try {
+            $this->docker->networkInspect('traefik');
+        } catch (NetworkInspectNotFoundException $e) {
+            $this->docker->networkCreate((new NetworksCreatePostBody())->setName('traefik'));
+        }
+    }
+
+    private function ensureThatTheTraefikContainerExists(): void
+    {
+        $traefikContainer = $this->getTraefikContainer();
+        if (null === $traefikContainer) {
+            $this->pullTraefikImage();
+            $this->createTraefikContainer();
+        }
+    }
+
+    private function startTheTraefikContainerIfStopped(): void
+    {
+        $traefikContainer = $this->getTraefikContainer();
+        if (null === $traefikContainer) {
+            throw new \RuntimeException('Expected the traefik container to be present but found none');
+        }
+        if ('running' !== $traefikContainer->getState()) {
+            $this->startTraefikContainer($traefikContainer->getId());
+        }
+    }
+
+    private function getTraefikContainer(): ?ContainerSummaryItem
+    {
+        $containerList = $this->docker->containerList(
+            [
+                'all' => true,
+                'filters' => \json_encode(['name' => [self::TRAEFIK_CONTAINER_NAME]]),
+            ]
+        );
+
+        if (empty($containerList)) {
+            return null;
+        }
+
+        return \current($containerList);
+    }
+
+    private function ensureThatTheTraefikContainerIsConnectedToTheTraefikNetwork(): void
+    {
+        if (!$this->traefikContainerAttachedToTraefikNetwork()) {
+            $this->docker->networkConnect(
+                'traefik',
+                (new NetworksIdConnectPostBody())->setContainer(self::TRAEFIK_CONTAINER_NAME)
+            );
+
+            $this->produceEvent(new EventProcessed('attached traefik container to the traefik network'));
+        }
+    }
+
+    private function traefikContainerAttachedToTraefikNetwork(): bool
+    {
+        $network = $this->docker->networkInspect('traefik');
+        foreach ($network->getContainers() as $container) {
+            if (self::TRAEFIK_CONTAINER_NAME === $container->getName()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

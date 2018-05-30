@@ -51,9 +51,9 @@ class CleanTheHostsFile implements EventListener, EventProducer
             $containerList
         );
 
-        foreach ($this->hostsFileManager->getDomainNames() as $container) {
-            if (!\in_array($container->getContainerName(), $containerNames, true)) {
-                $this->produceEvent(new DomainNamesRemoved($container->getContainerName(), [$container->getName()]));
+        foreach ($this->hostsFileManager->getDomainNames() as $domainName) {
+            if (!\in_array($domainName->getContainerName(), $containerNames, true)) {
+                $this->produceEvent(new DomainNamesRemoved($domainName->getContainerName(), [$domainName->getName()]));
             }
         }
 
@@ -63,7 +63,7 @@ class CleanTheHostsFile implements EventListener, EventProducer
         }
     }
 
-    private function extractDomainNames(\ArrayObject $containerAttributes): array
+    private function extractDomainNames(array $containerAttributes): array
     {
         $domainNames = [];
         foreach ($this->domainNameExtractors as $domainNameExtractor) {
@@ -75,15 +75,12 @@ class CleanTheHostsFile implements EventListener, EventProducer
         return $domainNames;
     }
 
-    /**
-     * @todo Duplicated from ExtractDomainNames. Need refactoring
-     */
     private function addDomainNamesIfAbsentFromTheHostsFile(array $domainNames, Container $container): void
     {
         foreach ($domainNames as $domainName) {
-            $domainName = new DomainName($container->getName(), $domainName);
+            $domainName = new DomainName($domainName, $container->getName());
             if (!$this->hostsFileManager->hasDomainName($domainName)) {
-                $this->produceEvent(new DomainNamesAdded($container->getName(), $domainNames));
+                $this->produceEvent(new DomainNamesAdded($container->getName(), $domainNames, $container->getLabels()));
                 break;
             }
         }

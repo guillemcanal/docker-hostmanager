@@ -78,7 +78,9 @@ class LocalFile implements File
 
     public function path(): string
     {
-        return \parse_url($this->filename)['path'];
+        $parts = \explode('://', $this->uri());
+
+        return \end($parts);
     }
 
     public function delete(): void

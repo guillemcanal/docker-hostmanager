@@ -123,6 +123,14 @@ class LocalFileTest extends TestCase
         assertFalse($dir->hasChild('foo'));
     }
 
+    /** @test */
+    public function it can return the path of a file()
+    {
+        $file = new LocalFile('file:///foo/bar.txt');
+
+        assertThat($file->path(), equalTo('/foo/bar.txt'));
+    }
+
     private function getDir(): vfsStreamDirectory
     {
         return vfsStream::setup('root', 0755);

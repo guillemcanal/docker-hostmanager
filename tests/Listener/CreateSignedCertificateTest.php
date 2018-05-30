@@ -25,7 +25,7 @@ class CreateSignedCertificateTest extends TestCase
             $directory->reveal()
         );
 
-        assertTrue($listener->subscription()->support(new DomainNamesAdded('', [])));
+        assertTrue($listener->subscription()->support(new DomainNamesAdded('', [], [])));
     }
 
     /** @test */
@@ -55,7 +55,7 @@ class CreateSignedCertificateTest extends TestCase
             $directory->reveal()
         );
 
-        $event = new DomainNamesAdded('test', ['test.domain.fr']);
+        $event = new DomainNamesAdded('test', ['test.domain.fr'], []);
 
         $listener->subscription()->handle($event);
 

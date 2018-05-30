@@ -47,7 +47,7 @@ class CreateTraefikTlsConfiguration implements EventListener, EventProducer
 TOML;
 
         $traefikConfDirectory = $this->directory->directory(EnsureThatTraefikIsRunning::TRAEFIK_CONF_DIRECTORY);
-        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName().'.toml');
+        $containerTlsConfigFile = $traefikConfDirectory->file($event->getContainerName().'.tls.toml');
         $containerTlsConfigFile->put($tomlConfig);
 
         $this->produceEvent(new TraefikTlsConfigurationCreated($event->getContainerName()));
