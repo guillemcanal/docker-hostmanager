@@ -2,6 +2,7 @@
 
 namespace ElevenLabs\DockerHostManager\File;
 
+use ElevenLabs\DockerHostManager\File\Exception\UnableToCreateDirectory;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
@@ -51,8 +52,50 @@ class LocalDirectoryTest extends TestCase
         assertThat($directory->uri(), equalTo('file://foo'));
     }
 
+    /** @test */
+    public function it can return the path of a directory()
+    {
+        $directory = (new LocalDirectory('foo'))->directory('bar');
+
+        assertThat($directory->path(), equalTo('foo/bar'));
+    }
+
+    /** @test */
+    public function it can return a directory()
+    {
+        $directory = new LocalDirectory('foo');
+
+        assertThat($directory->directory('bar'), isInstanceOf(LocalDirectory::class));
+    }
+
+    /** @test */
+    public function it can create a directory()
+    {
+        $directory = new LocalDirectory(($streamDir = $this->getDir())->url());
+
+        $newDirectory = $directory->directory('new');
+        $newDirectory->create();
+
+        assertThat($streamDir->hasChild('new'), isTrue());
+    }
+
+    /** @test */
+    public function it cannot create a directory when the root directory is not writable()
+    {
+        $this->expectException(UnableToCreateDirectory::class);
+        $this->expectExceptionMessageRegExp('/^Unable to create directory/');
+
+        $directory = new LocalDirectory($this->getLockedDir()->url());
+        $directory->directory('new')->create();
+    }
+
     private function getDir(): vfsStreamDirectory
     {
         return vfsStream::setup('root');
+    }
+
+    private function getLockedDir(): vfsStreamDirectory
+    {
+        return vfsStream::setup('root', 0555);
     }
 }

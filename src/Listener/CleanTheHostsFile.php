@@ -4,21 +4,29 @@ declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
+use ElevenLabs\DockerHostManager\Container;
+use ElevenLabs\DockerHostManager\DomainName;
+use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
 use ElevenLabs\DockerHostManager\Event\ContainerListReceived;
+use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
 use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
+use ElevenLabs\DockerHostManager\EventDispatcher\EventProducerTrait;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
 use ElevenLabs\DockerHostManager\HostsFileManager;
 
 class CleanTheHostsFile implements EventListener, EventProducer
 {
-    private $hostsFileManager;
-    private $producedEvents = [];
+    use EventProducerTrait;
 
-    public function __construct(HostsFileManager $hostsFileManager)
+    private $hostsFileManager;
+    private $domainNameExtractors;
+
+    public function __construct(HostsFileManager $hostsFileManager, DomainNameExtractor ...$domainNameExtractors)
     {
         $this->hostsFileManager = $hostsFileManager;
+        $this->domainNameExtractors = $domainNameExtractors;
     }
 
     public function subscription(): EventSubscription
@@ -26,30 +34,55 @@ class CleanTheHostsFile implements EventListener, EventProducer
         return new EventSubscription(
             ContainerListReceived::class,
             function (ContainerListReceived $event): void {
-                $this->cleanup($event->getDomainNames());
+                $this->cleanup($event->getContainerList());
             }
         );
     }
 
-    public function producedEvents(): array
+    /**
+     * @param array|Container[] $containerList
+     */
+    public function cleanup(array $containerList): void
     {
-        $events = $this->producedEvents;
-        $this->producedEvents = [];
+        $containerNames = \array_map(
+            function (Container $container) {
+                return $container->getName();
+            },
+            $containerList
+        );
 
-        return $events;
-    }
-
-    public function cleanup(array $containerNames): void
-    {
         foreach ($this->hostsFileManager->getDomainNames() as $domainName) {
-            if (!\in_array($domainName->getName(), $containerNames, true)) {
+            if (!\in_array($domainName->getContainerName(), $containerNames, true)) {
                 $this->produceEvent(new DomainNamesRemoved($domainName->getContainerName(), [$domainName->getName()]));
             }
         }
+
+        foreach ($containerList as $container) {
+            $domainNames = $this->extractDomainNames($container->getLabels());
+            $this->addDomainNamesIfAbsentFromTheHostsFile($domainNames, $container);
+        }
     }
 
-    private function produceEvent($event): void
+    private function extractDomainNames(array $containerAttributes): array
     {
-        $this->producedEvents[] = $event;
+        $domainNames = [];
+        foreach ($this->domainNameExtractors as $domainNameExtractor) {
+            if ($domainNameExtractor->provideDomainNames($containerAttributes)) {
+                \array_push($domainNames, ...$domainNameExtractor->getDomainNames($containerAttributes));
+            }
+        }
+
+        return $domainNames;
+    }
+
+    private function addDomainNamesIfAbsentFromTheHostsFile(array $domainNames, Container $container): void
+    {
+        foreach ($domainNames as $domainName) {
+            $domainName = new DomainName($domainName, $container->getName());
+            if (!$this->hostsFileManager->hasDomainName($domainName)) {
+                $this->produceEvent(new DomainNamesAdded($container->getName(), $domainNames, $container->getLabels()));
+                break;
+            }
+        }
     }
 }

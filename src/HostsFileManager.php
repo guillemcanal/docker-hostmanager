@@ -8,7 +8,7 @@ use ElevenLabs\DockerHostManager\File\File;
 
 class HostsFileManager
 {
-    private const HOSTS_FILE_FENCED_BLOCK_REGEX = '/#<docker-stack>\n(?P<domainNames>.+?)?#<\/docker-stack>/s';
+    private const HOSTS_FILE_FENCED_BLOCK_REGEX = '/#<docker-hostmanager>\n(?P<domainNames>.+?)?#<\/docker-hostmanager>/s';
 
     /** @var string */
     private $ipv4;
@@ -43,7 +43,7 @@ class HostsFileManager
 
     private function addDockerStackFencedBlock(): void
     {
-        $this->hostsFile->put($this->hostsFile->read()."\n#<docker-stack>\n#</docker-stack>");
+        $this->hostsFile->put($this->hostsFile->read()."\n#<docker-hostmanager>\n#</docker-hostmanager>");
     }
 
     /**
@@ -98,7 +98,7 @@ class HostsFileManager
             self::HOSTS_FILE_FENCED_BLOCK_REGEX,
             function () use ($domainNameLines) {
                 return \sprintf(
-                    "#<docker-stack>\n%s\n#</docker-stack>",
+                    "#<docker-hostmanager>\n%s\n#</docker-hostmanager>",
                     \implode("\n", $domainNameLines)
                 );
             },

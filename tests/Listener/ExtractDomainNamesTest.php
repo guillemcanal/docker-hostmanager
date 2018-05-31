@@ -26,7 +26,7 @@ class ExtractDomainNamesTest extends TestCase
      */
     public function it handle(string $containerAction, string $expectedProducedEvent)
     {
-        $containerAttributes = new \ArrayObject(['name' => 'test-container']);
+        $containerAttributes = ['name' => 'test-container'];
 
         $domainNameExtractor = $this->prophesize(DomainNameExtractor::class);
         $domainNameExtractor->provideDomainNames($containerAttributes)->willReturn(true);
@@ -38,7 +38,7 @@ class ExtractDomainNamesTest extends TestCase
         $event
             ->setType('container')
             ->setAction($containerAction)
-            ->setActor((new EventsGetResponse200Actor())->setAttributes($containerAttributes));
+            ->setActor((new EventsGetResponse200Actor())->setAttributes(new \ArrayObject($containerAttributes)));
 
         $listener->subscription()->handle(new DockerEventReceived($event));
 

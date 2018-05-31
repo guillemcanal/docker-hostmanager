@@ -46,7 +46,7 @@ class CertificateGeneratorTest extends TestCase
             $this->issuerCertificateBundle
         );
 
-        $signedCertificateBundle = $certificateGenerator->generate(['foo.domain.fr', 'bar.domain.fr']);
+        $signedCertificateBundle = $certificateGenerator->generate(['foo.domain.fr']);
 
         assertTrue(
             $signedCertificateBundle->getCertificate()->verify(
@@ -76,7 +76,7 @@ class CertificateGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it use the given dns names as subject alternative names except from the first()
+    public function it dns names as subject alternative names()
     {
         $certificateGenerator = new CertificateGenerator(
             $this->subject,
@@ -84,7 +84,7 @@ class CertificateGeneratorTest extends TestCase
             $this->issuerCertificateBundle
         );
 
-        $signedCertificateBundle = $certificateGenerator->generate(['foo.domain.fr', 'bar.domain.fr', 'baz.domain.fr']);
+        $signedCertificateBundle = $certificateGenerator->generate(['foo.domain.fr', 'bar.domain.fr']);
 
         $subjectAlternativeNames = $signedCertificateBundle
             ->getCertificate()
@@ -97,7 +97,7 @@ class CertificateGeneratorTest extends TestCase
 
         assertThat(
             $subjectAlternativeNames->allOf(GeneralName::TAG_DNS_NAME),
-            equalTo(['bar.domain.fr', 'baz.domain.fr'])
+            equalTo(['foo.domain.fr', 'bar.domain.fr'])
         );
     }
 }

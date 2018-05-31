@@ -12,6 +12,12 @@ abstract class DomainNamesEvent implements Event
     private $containerName;
     private $domainNames;
 
+    public function __construct($containerName, array $domainNames)
+    {
+        $this->containerName = $containerName;
+        $this->domainNames = $domainNames;
+    }
+
     public function getType(): EventType
     {
         return new EventType(EventType::EVENT_STANDARD);
@@ -23,12 +29,6 @@ abstract class DomainNamesEvent implements Event
             'containerName' => $this->containerName,
             'domainNames' => $this->domainNames,
         ];
-    }
-
-    public function __construct(string $containerName, array $domainNames)
-    {
-        $this->containerName = $containerName;
-        $this->domainNames = $domainNames;
     }
 
     public function getContainerName(): string

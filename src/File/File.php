@@ -52,6 +52,13 @@ interface File
     public function uri(): string;
 
     /**
+     * Return the path of a file.
+     *
+     * @return string
+     */
+    public function path(): string;
+
+    /**
      * Delete the file.
      */
     public function delete(): void;

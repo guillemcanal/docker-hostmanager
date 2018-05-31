@@ -8,6 +8,7 @@ use Docker\API\Model\ContainerSummaryItem;
 use Docker\API\Model\EventsGetResponse200;
 use Docker\Docker;
 use Docker\Stream\EventStream;
+use ElevenLabs\DockerHostManager\Event\ApplicationStarted;
 use ElevenLabs\DockerHostManager\Event\ContainerListReceived;
 use ElevenLabs\DockerHostManager\Event\DockerEventReceived;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventDispatcher;
@@ -28,6 +29,7 @@ class DockerEvents
 
     public function listen(): void
     {
+        $this->applicationStarted();
         $this->listContainerNames();
         /** @var EventStream $events */
         $events = $this->docker->systemEvents();
@@ -45,7 +47,10 @@ class DockerEvents
     {
         $names = \array_map(
             function (ContainerSummaryItem $item) {
-                return \ltrim(\current($item->getNames()), '/');
+                $containerName = \ltrim(\current($item->getNames()), '/');
+                $containerLabels = $item->getLabels() ?: new \ArrayObject();
+
+                return new Container($containerName, \iterator_to_array($containerLabels));
             },
             $this->docker->containerList()
         );
@@ -53,5 +58,10 @@ class DockerEvents
         if (!empty($names)) {
             $this->dispatcher->dispatch(new ContainerListReceived(...$names));
         }
+    }
+
+    private function applicationStarted(): void
+    {
+        $this->dispatcher->dispatch(new ApplicationStarted());
     }
 }

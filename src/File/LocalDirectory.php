@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\File;
 
+use ElevenLabs\DockerHostManager\File\Exception\UnableToCreateDirectory;
+
 class LocalDirectory implements Directory
 {
     private $dirname;
@@ -28,6 +30,18 @@ class LocalDirectory implements Directory
         return LocalFile::get($this->uri().'/'.$path);
     }
 
+    public function directory(string $path): Directory
+    {
+        return self::get($this->uri().'/'.$path);
+    }
+
+    public function create(): void
+    {
+        if (!\mkdir($this->dirname) && !\is_dir($this->dirname)) {
+            throw new UnableToCreateDirectory('Unable to create directory '.$this->uri());
+        }
+    }
+
     public function exists(): bool
     {
         return \is_dir($this->dirname);
@@ -36,5 +50,12 @@ class LocalDirectory implements Directory
     public function uri(): string
     {
         return $this->dirname;
+    }
+
+    public function path(): string
+    {
+        $parts = \explode('://', $this->uri());
+
+        return \end($parts);
     }
 }

@@ -9,14 +9,16 @@ use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
 use ElevenLabs\DockerHostManager\Event\SignedCertificateCreated;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
+use ElevenLabs\DockerHostManager\EventDispatcher\EventProducerTrait;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
 use ElevenLabs\DockerHostManager\File\Directory;
 
 class CreateSignedCertificate implements EventListener, EventProducer
 {
+    use EventProducerTrait;
+
     private $certificateGenerator;
     private $directory;
-    private $producedEvents = [];
 
     public function __construct(
         CertificateGenerator $certificateGenerator,
@@ -53,18 +55,5 @@ class CreateSignedCertificate implements EventListener, EventProducer
                 $this->handle($event);
             }
         );
-    }
-
-    public function producedEvents(): array
-    {
-        $events = $this->producedEvents;
-        $this->producedEvents = [];
-
-        return $events;
-    }
-
-    private function produceEvent(SignedCertificateCreated $event): void
-    {
-        $this->producedEvents[] = $event;
     }
 }
