@@ -20,7 +20,7 @@ class RootCertificateTest extends TestCase
     }
 
     /** @test */
-    public function it can create a valid root certificate()
+    public function it_can_create_a_valid_root_certificate()
     {
         $rootCertificate = new RootCertificate(
             new LocalDirectory($this->rootDirectory->url()),
@@ -50,7 +50,7 @@ class RootCertificateTest extends TestCase
     }
 
     /** @test */
-    public function it save the root certificate and its key on the filesystem()
+    public function it_save_the_root_certificate_and_its_key_on_the_filesystem()
     {
         $rootCertificate = new RootCertificate(
             new LocalDirectory($this->rootDirectory->url()),
@@ -71,7 +71,7 @@ class RootCertificateTest extends TestCase
     }
 
     /** @test */
-    public function it can load the root certificate bundle from the filesystem()
+    public function it_can_load_the_root_certificate_bundle_from_the_filesystem()
     {
         $fixturesDirectory = __DIR__ . '/Fixtures/root-ca';
 

@@ -22,7 +22,7 @@ jobs:
     - sonar-scanner
 
   - stage: 'Docker image'
-    if: branch = master
+    if: branch = master OR tag IS present
     services:
     - docker
     script: bash ./scripts/docker-push.sh

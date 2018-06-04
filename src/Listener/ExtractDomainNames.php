@@ -6,9 +6,9 @@ namespace ElevenLabs\DockerHostManager\Listener;
 
 use Docker\API\Model\EventsGetResponse200;
 use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
+use ElevenLabs\DockerHostManager\Event\ContainerCreated;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
 use ElevenLabs\DockerHostManager\Event\DockerEventReceived;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducerTrait;
@@ -53,10 +53,10 @@ class ExtractDomainNames implements EventListener, EventProducer
         $domainNames = $this->extractDomainNamesFromContainerAttributes($containerAttributes);
 
         if (!empty($domainNames) && 'create' === $event->getAction()) {
-            $this->produceEvent(new DomainNamesAdded($containerName, $domainNames, $containerAttributes));
+            $this->produceEvent(new ContainerCreated($containerName, $domainNames, $containerAttributes));
         }
         if (!empty($domainNames) && 'destroy' === $event->getAction()) {
-            $this->produceEvent(new DomainNamesRemoved($containerName, $domainNames));
+            $this->produceEvent(new ContainerRemoved($containerName, $domainNames));
         }
     }
 

@@ -3,23 +3,33 @@
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use ElevenLabs\DockerHostManager\DomainName;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
+use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\HostsFileManager;
 use PHPUnit\Framework\TestCase;
 
 class RemoveDomainNamesTest extends TestCase
 {
     /** @test */
-    public function it subscribe to the DomainNamesRemoved event()
+    public function it_implements_the_event_listener_interface()
     {
         $hostsFileManager = $this->prophesize(HostsFileManager::class);
         $listener = new RemoveDomainNames($hostsFileManager->reveal());
 
-        assertTrue($listener->subscription()->support(new DomainNamesRemoved('', [])));
+        assertThat($listener, isInstanceOf(EventListener::class));
     }
 
     /** @test */
-    public function it can remove a domain name from the hosts file()
+    public function it_subscribe_to_the_container_removed_event()
+    {
+        $hostsFileManager = $this->prophesize(HostsFileManager::class);
+        $listener = new RemoveDomainNames($hostsFileManager->reveal());
+
+        assertTrue($listener->subscription()->support(new ContainerRemoved('', [])));
+    }
+
+    /** @test */
+    public function it_can_remove_a_domain_name_from_the_hosts_file()
     {
         $expectedDomainName = new DomainName('test.domain.fr', 'test');
 
@@ -29,6 +39,6 @@ class RemoveDomainNamesTest extends TestCase
 
         $listener = new RemoveDomainNames($hostsFileManager->reveal());
 
-        $listener->subscription()->handle(new DomainNamesRemoved('test', ['test.domain.fr']));
+        $listener->subscription()->handle(new ContainerRemoved('test', ['test.domain.fr']));
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Event;
 
-class DomainNamesAdded extends DomainNamesEvent
+class ContainerCreated extends ContainerEvent
 {
     private $containerAttributes;
 
@@ -16,7 +16,7 @@ class DomainNamesAdded extends DomainNamesEvent
 
     public function getName(): string
     {
-        return 'domain.names.added';
+        return 'container.created';
     }
 
     public function toArray(): array

@@ -9,7 +9,7 @@ use X509\Certificate\Certificate;
 class CertificateBundleTest extends TestCase
 {
     /** @test */
-    public function it bundle a certificate and a private key()
+    public function it_bundle_a_certificate_and_a_private_key()
     {
         $certificateMock    = $this->prophesize(Certificate::class);
         $privateKeyInfoMock = $this->prophesize(PrivateKeyInfo::class);

@@ -8,28 +8,28 @@ use PHPUnit\Framework\TestCase;
 class SignedCertificateCreatedTest extends TestCase
 {
     /** @test */
-    public function it implements the event interface()
+    public function it_implements_the_event_interface()
     {
         $event = new SignedCertificateCreated('test', ['foo.domain.fr'], '/cert.crt', '/cert.key');
         assertThat($event, isInstanceOf(Event::class));
     }
 
     /** @test */
-    public function it provide a name()
+    public function it_provide_a_name()
     {
         $event = new SignedCertificateCreated('test', ['foo.domain.fr'], '/cert.crt', '/cert.key');
         assertThat($event->getName(), equalTo('signed.certificate.created'));
     }
 
     /** @test */
-    public function it provide a type()
+    public function it_provide_a_type()
     {
         $event = new SignedCertificateCreated('test', ['foo.domain.fr'], '/cert.crt', '/cert.key');
         assertThat($event->getType(), equalTo(new EventType(EventType::EVENT_STANDARD)));
     }
 
     /** @test */
-    public function it can be transformed into an array()
+    public function it_can_be_transformed_into_an_array()
     {
         $event = new SignedCertificateCreated('test', ['foo.domain.fr'], '/cert.crt', '/cert.key');
         assertThat(
@@ -46,7 +46,7 @@ class SignedCertificateCreatedTest extends TestCase
     }
 
     /** @test */
-    public function it prodive domain names()
+    public function it_prodive_domain_names()
     {
         $event = new SignedCertificateCreated('test', ['foo.domain.fr'], '/cert.crt', '/cert.key');
         assertThat($event->getDomainNames(), equalTo(['foo.domain.fr']));

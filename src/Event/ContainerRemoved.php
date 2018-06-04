@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Event;
 
-class DomainNamesRemoved extends DomainNamesEvent
+class ContainerRemoved extends ContainerEvent
 {
     public function getName(): string
     {
-        return 'domain.names.removed';
+        return 'container.removed';
     }
 }

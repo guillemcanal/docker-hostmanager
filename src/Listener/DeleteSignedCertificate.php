@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ElevenLabs\DockerHostManager\Listener;
 
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
 use ElevenLabs\DockerHostManager\Event\SignedCertificateRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
@@ -23,7 +23,7 @@ class DeleteSignedCertificate implements EventListener, EventProducer
         $this->directory = $directory;
     }
 
-    private function handle(DomainNamesRemoved $event): void
+    private function handle(ContainerRemoved $event): void
     {
         $containerName = $event->getContainerName();
         $certFile = $this->directory->file('certs/'.$containerName.'.crt');
@@ -44,8 +44,8 @@ class DeleteSignedCertificate implements EventListener, EventProducer
     public function subscription(): EventSubscription
     {
         return new EventSubscription(
-            DomainNamesRemoved::class,
-            function (DomainNamesRemoved $event): void {
+            ContainerRemoved::class,
+            function (ContainerRemoved $event): void {
                 $this->handle($event);
             }
         );

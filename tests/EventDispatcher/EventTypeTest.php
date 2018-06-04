@@ -10,7 +10,7 @@ class EventTypeTest extends TestCase
      * @test
      * @dataProvider  getValidEventType
      */
-    public function it can be(string $eventTypeString)
+    public function it_can_be(string $eventTypeString)
     {
         $eventType = new EventType($eventTypeString);
 
@@ -27,7 +27,7 @@ class EventTypeTest extends TestCase
     }
 
     /** @test */
-    public function it throw and exception when the given event type is not suported()
+    public function it_throw_and_exception_when_the_given_event_type_is_not_suported()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/^hello is not a valid event type./');

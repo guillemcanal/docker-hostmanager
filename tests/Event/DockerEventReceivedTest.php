@@ -9,28 +9,28 @@ use PHPUnit\Framework\TestCase;
 class DockerEventReceivedTest extends TestCase
 {
     /** @test */
-    public function it implements the event interface()
+    public function it_implements_the_event_interface()
     {
         $event = new DockerEventReceived(new EventsGetResponse200());
         assertThat($event, isInstanceOf(Event::class));
     }
 
     /** @test */
-    public function it provide a name()
+    public function it_provide_a_name()
     {
         $event = new DockerEventReceived(new EventsGetResponse200());
         assertThat($event->getName(), equalTo('docker.event.received'));
     }
 
     /** @test */
-    public function it provide a type()
+    public function it_provide_a_type()
     {
         $event = new DockerEventReceived(new EventsGetResponse200());
         assertThat($event->getType(), equalTo(new EventType(EventType::EVENT_INTERNAL)));
     }
 
     /** @test */
-    public function it can be transformed into an array()
+    public function it_can_be_transformed_into_an_array()
     {
         $event = new DockerEventReceived(
             (new EventsGetResponse200())

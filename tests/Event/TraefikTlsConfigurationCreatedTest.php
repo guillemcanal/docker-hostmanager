@@ -9,28 +9,28 @@ use PHPUnit\Framework\TestCase;
 class TraefikTlsConfigurationCreatedTest extends TestCase
 {
     /** @test */
-    public function it implements the event interface()
+    public function it_implements_the_event_interface()
     {
         $event = new TraefikTlsConfigurationCreated('test');
         assertThat($event, isInstanceOf(Event::class));
     }
 
     /** @test */
-    public function it provide a name()
+    public function it_provide_a_name()
     {
         $event = new TraefikTlsConfigurationCreated('test');
         assertThat($event->getName(), equalTo('traefik.tls.configuration.created'));
     }
 
     /** @test */
-    public function it provide a type()
+    public function it_provide_a_type()
     {
         $event = new TraefikTlsConfigurationCreated('test');
         assertThat($event->getType(), equalTo(new EventType(EventType::EVENT_STANDARD)));
     }
 
     /** @test */
-    public function it can be transformed into an array()
+    public function it_can_be_transformed_into_an_array()
     {
         $event = new TraefikTlsConfigurationCreated('test');
         assertThat($event->toArray(), equalTo(['containerName' => 'test']));

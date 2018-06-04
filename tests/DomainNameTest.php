@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 class DomainNameTest extends TestCase
 {
     /** @test */
-    public function it should be constructed with a domain name and a container name()
+    public function it_should_be_constructed_with_a_domain_name_and_a_container_name()
     {
         $domainName = new DomainName('dev.foo.fr', 'foo');
 
@@ -16,7 +16,7 @@ class DomainNameTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to get the string representation of the domain name without an ipv4()
+    public function it_throw_an_exception_when_trying_to_get_the_string_representation_of_the_domain_name_without_an_ipv4()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The domain name is not mapped to an ipv4');
@@ -25,7 +25,7 @@ class DomainNameTest extends TestCase
     }
 
     /** @test */
-    public function it can parse a domain name from a string()
+    public function it_can_parse_a_domain_name_from_a_string()
     {
         $domainName = DomainName::fromString('127.0.0.1 dev.foo.fr #container-name');
 
@@ -35,7 +35,7 @@ class DomainNameTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when the parsed domain name string is invalid()
+    public function it_throw_an_exception_when_the_parsed_domain_name_string_is_invalid()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to parse the container domain string: invalid string');

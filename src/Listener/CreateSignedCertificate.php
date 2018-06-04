@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use ElevenLabs\DockerHostManager\CertificateGenerator;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
+use ElevenLabs\DockerHostManager\Event\ContainerCreated;
 use ElevenLabs\DockerHostManager\Event\SignedCertificateCreated;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
@@ -28,7 +28,7 @@ class CreateSignedCertificate implements EventListener, EventProducer
         $this->directory = $directory;
     }
 
-    private function handle(DomainNamesAdded $event): void
+    private function handle(ContainerCreated $event): void
     {
         $containerName = $event->getContainerName();
         $domainNames = $event->getDomainNames();
@@ -50,8 +50,8 @@ class CreateSignedCertificate implements EventListener, EventProducer
     public function subscription(): EventSubscription
     {
         return new EventSubscription(
-            DomainNamesAdded::class,
-            function (DomainNamesAdded $event): void {
+            ContainerCreated::class,
+            function (ContainerCreated $event): void {
                 $this->handle($event);
             }
         );

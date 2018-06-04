@@ -7,9 +7,9 @@ namespace ElevenLabs\DockerHostManager\Listener;
 use ElevenLabs\DockerHostManager\Container;
 use ElevenLabs\DockerHostManager\DomainName;
 use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
+use ElevenLabs\DockerHostManager\Event\ContainerCreated;
 use ElevenLabs\DockerHostManager\Event\ContainerListReceived;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducerTrait;
@@ -53,7 +53,7 @@ class CleanTheHostsFile implements EventListener, EventProducer
 
         foreach ($this->hostsFileManager->getDomainNames() as $domainName) {
             if (!\in_array($domainName->getContainerName(), $containerNames, true)) {
-                $this->produceEvent(new DomainNamesRemoved($domainName->getContainerName(), [$domainName->getName()]));
+                $this->produceEvent(new ContainerRemoved($domainName->getContainerName(), [$domainName->getName()]));
             }
         }
 
@@ -80,7 +80,7 @@ class CleanTheHostsFile implements EventListener, EventProducer
         foreach ($domainNames as $domainName) {
             $domainName = new DomainName($domainName, $container->getName());
             if (!$this->hostsFileManager->hasDomainName($domainName)) {
-                $this->produceEvent(new DomainNamesAdded($container->getName(), $domainNames, $container->getLabels()));
+                $this->produceEvent(new ContainerCreated($container->getName(), $domainNames, $container->getLabels()));
                 break;
             }
         }

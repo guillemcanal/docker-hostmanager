@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class RsaKeyGeneratorTest extends TestCase
 {
     /** @test */
-    public function it generate a valid rsa private key()
+    public function it_generate_a_valid_rsa_private_key()
     {
         $rsaPrivateKey  = (new RsaKeyGenerator())->generate();
         $privateKeyDetails = $this->getPrivateKeyDetails($rsaPrivateKey);
@@ -19,7 +19,7 @@ class RsaKeyGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it accept a key size()
+    public function it_accept_a_key_size()
     {
         $rsaPrivateKey  = (new RsaKeyGenerator($expectedKeySize = 4096))->generate();
         $privateKeyDetails = $this->getPrivateKeyDetails($rsaPrivateKey);
@@ -29,7 +29,7 @@ class RsaKeyGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it throw an expection when the key size is to small()
+    public function it_throw_an_expection_when_the_key_size_is_to_small()
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Keys with fewer than 2048 bits are not allowed.');

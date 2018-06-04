@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use Docker\API\Exception\ImageInspectNotFoundException;
-use Docker\API\Exception\NetworkInspectNotFoundException;
 use Docker\API\Model\ContainersCreatePostBody;
 use Docker\API\Model\ContainerSummaryItem;
 use Docker\API\Model\HostConfig;
-use Docker\API\Model\NetworksCreatePostBody;
-use Docker\API\Model\NetworksIdConnectPostBody;
 use Docker\API\Model\PortBinding;
 use Docker\Docker;
 use Docker\Stream\CreateImageStream;
 use ElevenLabs\DockerHostManager\Event\ApplicationStarted;
+use ElevenLabs\DockerHostManager\Event\ContainerCreated;
 use ElevenLabs\DockerHostManager\Event\EventProcessed;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventProducer;
@@ -32,6 +30,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
     private const TRAEFIK_CONTAINER_NAME = 'docker-hostmanager-traefik';
     private const TRAEFIK_VERSION = 'v1.6.2';
     public const TRAEFIK_CONF_DIRECTORY = 'traefik';
+    private const TRAEFIK_DOMAIN_NAME = 'traefik.docker';
 
     private $docker;
     private $directory;
@@ -55,10 +54,8 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
     private function check(): void
     {
         $this->ensureConfigurationDirectoryExists();
-        $this->ensureThatTheTraefikNetworkExists();
         $this->ensureThatTheTraefikContainerExists();
         $this->startTheTraefikContainerIfStopped();
-        $this->ensureThatTheTraefikContainerIsConnectedToTheTraefikNetwork();
     }
 
     private function createTraefikContainer(): void
@@ -80,7 +77,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                         'traefik.enable' => 'true',
                         'traefik.backend' => 'traefik',
                         'traefik.port' => '8080',
-                        'traefik.frontend.rule' => 'Host: traefik.docker',
+                        'traefik.frontend.rule' => 'Host: '.self::TRAEFIK_DOMAIN_NAME,
                     ]
                 )
             )
@@ -121,7 +118,9 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
             ['name' => self::TRAEFIK_CONTAINER_NAME]
         );
 
-        $this->produceEvent(new EventProcessed('traefik container created'));
+        $this->produceEvent(
+            new ContainerCreated(self::TRAEFIK_CONTAINER_NAME, [self::TRAEFIK_DOMAIN_NAME], [])
+        );
     }
 
     private function startTraefikContainer(string $containerId): void
@@ -151,15 +150,6 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
         if (!$traefikConfDirectory->exists()) {
             $traefikConfDirectory->create();
             $this->produceEvent(new EventProcessed('traefik tls config directory created'));
-        }
-    }
-
-    private function ensureThatTheTraefikNetworkExists(): void
-    {
-        try {
-            $this->docker->networkInspect('traefik');
-        } catch (NetworkInspectNotFoundException $e) {
-            $this->docker->networkCreate((new NetworksCreatePostBody())->setName('traefik'));
         }
     }
 
@@ -197,29 +187,5 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
         }
 
         return \current($containerList);
-    }
-
-    private function ensureThatTheTraefikContainerIsConnectedToTheTraefikNetwork(): void
-    {
-        if (!$this->traefikContainerAttachedToTraefikNetwork()) {
-            $this->docker->networkConnect(
-                'traefik',
-                (new NetworksIdConnectPostBody())->setContainer(self::TRAEFIK_CONTAINER_NAME)
-            );
-
-            $this->produceEvent(new EventProcessed('attached traefik container to the traefik network'));
-        }
-    }
-
-    private function traefikContainerAttachedToTraefikNetwork(): bool
-    {
-        $network = $this->docker->networkInspect('traefik');
-        foreach ($network->getContainers() as $container) {
-            if (self::TRAEFIK_CONTAINER_NAME === $container->getName()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

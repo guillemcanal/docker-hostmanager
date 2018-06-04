@@ -38,7 +38,7 @@ class CertificateGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it can generate a valid signed certificate()
+    public function it_can_generate_a_valid_signed_certificate()
     {
         $certificateGenerator = new CertificateGenerator(
             $this->subject,
@@ -56,7 +56,7 @@ class CertificateGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it use the first given dns name as a common name()
+    public function it_use_the_first_given_dns_name_as_a_common_name()
     {
         $certificateGenerator = new CertificateGenerator(
             $this->subject,
@@ -76,7 +76,7 @@ class CertificateGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it dns names as subject alternative names()
+    public function it_dns_names_as_subject_alternative_names()
     {
         $certificateGenerator = new CertificateGenerator(
             $this->subject,

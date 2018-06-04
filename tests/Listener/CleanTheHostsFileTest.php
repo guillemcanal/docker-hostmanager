@@ -6,8 +6,8 @@ use ElevenLabs\DockerHostManager\Container;
 use ElevenLabs\DockerHostManager\DomainName;
 use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
 use ElevenLabs\DockerHostManager\Event\ContainerListReceived;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
+use ElevenLabs\DockerHostManager\Event\ContainerCreated;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\HostsFileManager;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,16 @@ use Prophecy\Argument;
 class CleanTheHostsFileTest extends TestCase
 {
     /** @test */
-    public function it subscribe to the ContainerListReceived events()
+    public function it_implements_the_event_listener_interface()
+    {
+        $hostsFileManager = $this->prophesize(HostsFileManager::class);
+        $listener = new CleanTheHostsFile($hostsFileManager->reveal());
+
+        assertThat($listener, isInstanceOf(EventListener::class));
+    }
+
+    /** @test */
+    public function it_subscribe_to_the_container_list_received_events()
     {
         $hostsFileManager = $this->prophesize(HostsFileManager::class);
         $event = $this->prophesize(ContainerListReceived::class);
@@ -28,7 +37,7 @@ class CleanTheHostsFileTest extends TestCase
     }
 
     /** @test */
-    public function it produce a DomainNamesRemoved event when it cant find it in the hosts file()
+    public function it_produce_a_container_removed_event_when_it_cant_find_it_in_the_hosts_file()
     {
         $aDomainNamesFromHostsFile = new DomainName('foo.domain.fr', 'unexisting-container');
 
@@ -41,13 +50,13 @@ class CleanTheHostsFileTest extends TestCase
         $producedEvents = $listener->producedEvents();
 
         assertThat($producedEvents, countOf(1));
-        assertThat(current($producedEvents), isInstanceOf(DomainNamesRemoved::class));
+        assertThat(current($producedEvents), isInstanceOf(ContainerRemoved::class));
         assertThat(current($producedEvents)->getContainerName(), equalTo('unexisting-container'));
         assertThat(current($producedEvents)->getDomainNames(), equalTo(['foo.domain.fr']));
     }
 
     /** @test */
-    public function it preserve a container domain name if is listed in the container list()
+    public function it_preserve_a_container_domain_name_if_is_listed_in_the_container_list()
     {
         $aDomainNamesFromHostsFile = new DomainName('foo.domain.fr', 'existing-container');
 
@@ -63,7 +72,7 @@ class CleanTheHostsFileTest extends TestCase
     }
 
     /** @test */
-    public function it add domain names in the hosts file when absent()
+    public function it_add_domain_names_in_the_hosts_file_when_absent()
     {
         $containerLabelsFromARunningContainer = ['docker.hostmanager.names' => 'foo.fr,bar.fr'];
 
@@ -90,7 +99,7 @@ class CleanTheHostsFileTest extends TestCase
         $producedEvents = $listener->producedEvents();
 
         assertThat($producedEvents, countOf(1));
-        assertThat(current($producedEvents), isInstanceOf(DomainNamesAdded::class));
+        assertThat(current($producedEvents), isInstanceOf(ContainerCreated::class));
         assertThat(current($producedEvents)->getContainerName(), equalTo('absent-container'));
         assertThat(current($producedEvents)->getDomainNames(), equalTo(['foo.fr', 'bar.fr']));
     }

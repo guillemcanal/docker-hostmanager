@@ -12,13 +12,13 @@ use PHPUnit\Framework\TestCase;
 class LocalFileTest extends TestCase
 {
     /** @test */
-    public function it implements file()
+    public function it_implements_file()
     {
         assertThat(new LocalFile('foo'), isInstanceOf(File::class));
     }
 
     /** @test */
-    public function it read the content of a file()
+    public function it_read_the_content_of_a_file()
     {
         $filename  = $this->addFile('foo', 'some content')->url();
         $localFile = new LocalFile($filename);
@@ -27,7 +27,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it can update the content of a file()
+    public function it_can_update_the_content_of_a_file()
     {
         $filename  = $this->addFile('foo')->url();
         $localFile = new LocalFile($filename);
@@ -37,7 +37,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it return true if a file exists()
+    public function it_return_true_if_a_file_exists()
     {
         $filename  = $this->addFile('foo')->url();
         $localFile = new LocalFile($filename);
@@ -46,7 +46,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it return false when a file does not exist()
+    public function it_return_false_when_a_file_does_not_exist()
     {
         $filename  = $this->getDir()->url() . '/foo';
         $localFile = new LocalFile($filename);
@@ -55,7 +55,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to get the content of the file which do not exist()
+    public function it_throw_an_exception_when_trying_to_get_the_content_of_the_file_which_do_not_exist()
     {
         $this->expectException(FileDoesNotExist::class);
 
@@ -65,7 +65,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to update the content of a file which is not writable()
+    public function it_throw_an_exception_when_trying_to_update_the_content_of_a_file_which_is_not_writable()
     {
         $this->expectException(CouldNotWriteFile::class);
 
@@ -76,7 +76,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it can create a file in a directory()
+    public function it_can_create_a_file_in_a_directory()
     {
         $file = new LocalFile($this->getDir()->url() . '/foo/bar.txt');
         $file->put('hello');
@@ -85,7 +85,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to create a file in a directory that is not writable()
+    public function it_throw_an_exception_when_trying_to_create_a_file_in_a_directory_that_is_not_writable()
     {
         $this->expectException(CouldNotWriteFile::class);
         $this->expectExceptionMessage('Unable to create file in vfs://root/foo');
@@ -97,7 +97,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it can be constructed statically()
+    public function it_can_be_constructed_statically()
     {
         $localFile = LocalFile::get('hello.txt');
 
@@ -105,14 +105,14 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it add the file scheme into the filename if not provided()
+    public function it_add_the_file_scheme_into_the_filename_if_not_provided()
     {
         $localFile = new LocalFile('foo');
         assertThat($localFile->uri(), equalTo('file://foo'));
     }
 
     /** @test */
-    public function it can delete a file()
+    public function it_can_delete_a_file()
     {
         $dir = $this->getDir();
 
@@ -124,7 +124,7 @@ class LocalFileTest extends TestCase
     }
 
     /** @test */
-    public function it can return the path of a file()
+    public function it_can_return_the_path_of_a_file()
     {
         $file = new LocalFile('file:///foo/bar.txt');
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ElevenLabs\DockerHostManager\Listener;
 
 use ElevenLabs\DockerHostManager\DomainName;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
 use ElevenLabs\DockerHostManager\HostsFileManager;
@@ -19,7 +19,7 @@ class RemoveDomainNames implements EventListener
         $this->hostsFileManager = $hostsFileManager;
     }
 
-    public function handle(DomainNamesRemoved $event): void
+    public function handle(ContainerRemoved $event): void
     {
         foreach ($event->getDomainNames() as $domainNameString) {
             $this->hostsFileManager->removeDomainName(new DomainName($domainNameString, $event->getContainerName()));
@@ -30,8 +30,8 @@ class RemoveDomainNames implements EventListener
     public function subscription(): EventSubscription
     {
         return new EventSubscription(
-            DomainNamesRemoved::class,
-            function (DomainNamesRemoved $event): void {
+            ContainerRemoved::class,
+            function (ContainerRemoved $event): void {
                 $this->handle($event);
             }
         );

@@ -40,7 +40,7 @@ $certificateGenerator = new DockerHostManager\CertificateGenerator($subject, $rs
 
 $hostsFileManager = new DockerHostManager\HostsFileManager(
     File\LocalFile::get(
-        \getenv('APP_HOSTS_PATH') ?: '/hosts/etc/hosts'
+        \getenv('APP_HOSTS_PATH') ?: '/host/etc/hosts'
     )
 );
 
@@ -48,11 +48,13 @@ $dockerClient = Docker::create();
 
 $eventDispatcher = new EventDispatcher\EventDispatcher(
     new Listener\LogEvents($logger),
-    new Listener\EnsureThatTraefikIsRunning($dockerClient, $dataDirectory),
     new Listener\CleanTheHostsFile($hostsFileManager, new DomainNameExtractor\TraefikFrontendRule()),
+    new Listener\CreateTraefikNetwork($dockerClient),
+    new Listener\EnsureThatTraefikIsRunning($dockerClient, $dataDirectory),
     new Listener\ExtractDomainNames(new DomainNameExtractor\TraefikFrontendRule()),
     new Listener\AddDomainNames($hostsFileManager),
     new Listener\RemoveDomainNames($hostsFileManager),
+    new Listener\AttachContainerToTraefikNetwork($dockerClient),
     new Listener\CreateSignedCertificate($certificateGenerator, $dataDirectory),
     new Listener\DeleteSignedCertificate($dataDirectory),
     new Listener\CreateTraefikTlsConfiguration($dataDirectory),

@@ -6,14 +6,24 @@ use Docker\API\Model\EventsGetResponse200;
 use Docker\API\Model\EventsGetResponse200Actor;
 use ElevenLabs\DockerHostManager\DomainNameExtractor\DomainNameExtractor;
 use ElevenLabs\DockerHostManager\Event\DockerEventReceived;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
+use ElevenLabs\DockerHostManager\Event\ContainerCreated;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
+use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use PHPUnit\Framework\TestCase;
 
 class ExtractDomainNamesTest extends TestCase
 {
     /** @test */
-    public function it subcribe to the DockerEventReceived event()
+    public function it_implements_the_event_listener_interface()
+    {
+        $domainNameExtractor = $this->prophesize(DomainNameExtractor::class);
+        $listener = new ExtractDomainNames($domainNameExtractor->reveal());
+
+        assertThat($listener, isInstanceOf(EventListener::class));
+    }
+
+    /** @test */
+    public function it_subcribe_to_the_docker_event_received_event()
     {
         $listener = new ExtractDomainNames();
 
@@ -24,7 +34,7 @@ class ExtractDomainNamesTest extends TestCase
      * @test
      * @dataProvider getSupportedContainerDockerEvents
      */
-    public function it handle(string $containerAction, string $expectedProducedEvent)
+    public function it_handle(string $containerAction, string $expectedProducedEvent)
     {
         $containerAttributes = ['name' => 'test-container'];
 
@@ -53,8 +63,8 @@ class ExtractDomainNamesTest extends TestCase
     public function  getSupportedContainerDockerEvents(): array
     {
         return [
-            'docker container create event'  => ['create', DomainNamesAdded::class],
-            'docker container destroy event' => ['destroy', DomainNamesRemoved::class],
+            'docker container created event'  => ['create', ContainerCreated::class],
+            'docker container removed event' => ['destroy', ContainerRemoved::class],
         ];
     }
 }

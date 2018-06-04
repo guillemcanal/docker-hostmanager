@@ -10,26 +10,26 @@ use PHPUnit\Framework\TestCase;
 class LocalDirectoryTest extends TestCase
 {
     /** @test */
-    public function it implements the directory interface()
+    public function it_implements_the_directory_interface()
     {
         assertThat(new LocalDirectory('foo'), isInstanceOf(Directory::class));
     }
 
     /** @test */
-    public function it can be constructed statically()
+    public function it_can_be_constructed_statically()
     {
         assertThat(LocalDirectory::get('foo'), isInstanceOf(Directory::class));
     }
 
     /** @test */
-    public function it can return a file()
+    public function it_can_return_a_file()
     {
         $file = (new LocalDirectory('foo'))->file('bar');
         assertThat($file, isInstanceOf(LocalFile::class));
     }
 
     /** @test */
-    public function it return true when the directory exist()
+    public function it_return_true_when_the_directory_exist()
     {
         $directory = new LocalDirectory($this->getDir()->url());
 
@@ -37,7 +37,7 @@ class LocalDirectoryTest extends TestCase
     }
 
     /** @test */
-    public function it return false when the directory does not exist()
+    public function it_return_false_when_the_directory_does_not_exist()
     {
         $directory = new LocalDirectory($this->getDir()->url() . '/foo');
 
@@ -45,7 +45,7 @@ class LocalDirectoryTest extends TestCase
     }
 
     /** @test */
-    public function it add the file scheme in the uri if not provided()
+    public function it_add_the_file_scheme_in_the_uri_if_not_provided()
     {
         $directory = new LocalDirectory('foo');
 
@@ -53,7 +53,7 @@ class LocalDirectoryTest extends TestCase
     }
 
     /** @test */
-    public function it can return the path of a directory()
+    public function it_can_return_the_path_of_a_directory()
     {
         $directory = (new LocalDirectory('foo'))->directory('bar');
 
@@ -61,7 +61,7 @@ class LocalDirectoryTest extends TestCase
     }
 
     /** @test */
-    public function it can return a directory()
+    public function it_can_return_a_directory()
     {
         $directory = new LocalDirectory('foo');
 
@@ -69,7 +69,7 @@ class LocalDirectoryTest extends TestCase
     }
 
     /** @test */
-    public function it can create a directory()
+    public function it_can_create_a_directory()
     {
         $directory = new LocalDirectory(($streamDir = $this->getDir())->url());
 
@@ -80,7 +80,7 @@ class LocalDirectoryTest extends TestCase
     }
 
     /** @test */
-    public function it cannot create a directory when the root directory is not writable()
+    public function it_cannot_create_a_directory_when_the_root_directory_is_not_writable()
     {
         $this->expectException(UnableToCreateDirectory::class);
         $this->expectExceptionMessageRegExp('/^Unable to create directory/');

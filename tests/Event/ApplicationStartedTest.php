@@ -8,28 +8,28 @@ use PHPUnit\Framework\TestCase;
 class ApplicationStartedTest extends TestCase
 {
     /** @test */
-    public function it implements the event interface()
+    public function it_implements_the_event_interface()
     {
         $event = new ApplicationStarted();
         assertThat($event, isInstanceOf(Event::class));
     }
 
     /** @test */
-    public function it provide a name()
+    public function it_provide_a_name()
     {
         $event = new ApplicationStarted();
         assertThat($event->getName(), equalTo('application.started'));
     }
 
     /** @test */
-    public function it provide a type()
+    public function it_provide_a_type()
     {
         $event = new ApplicationStarted();
         assertThat($event->getType(), equalTo(new EventType(EventType::EVENT_STANDARD)));
     }
 
     /** @test */
-    public function it can be transformed into an array()
+    public function it_can_be_transformed_into_an_array()
     {
         $event = new ApplicationStarted();
         assertThat($event->toArray(), equalTo([]));

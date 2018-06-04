@@ -23,7 +23,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when the hosts file cannot be found()
+    public function it_throw_an_exception_when_the_hosts_file_cannot_be_found()
     {
         $this->expectException(\UnexpectedValueException::class);
 
@@ -31,7 +31,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it should create a docker stack fenced block if not present in a hosts file()
+    public function it_should_create_a_docker_stack_fenced_block_if_not_present_in_a_hosts_file()
     {
         $actualContent = '127.0.0.1 localhost';
         $expectedContent = implode("\n",
@@ -53,7 +53,7 @@ class HostFileManagerTest extends TestCase
      * @test
      * @dataProvider getHostsFilesWithAnEmptyFencedBlocks
      */
-    public function it does not provide any domain names when the fenced block(string $hostsFileContent)
+    public function it_does_not_provide_any_domain_names_when_the_fenced_block(string $hostsFileContent)
     {
         $this->addHostsFile($hostsFileContent);
 
@@ -89,7 +89,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it can extract hostnames from a docker stack fenced block()
+    public function it_can_extract_hostnames_from_a_docker_stack_fenced_block()
     {
         $actualContent = implode("\n",
             [
@@ -118,7 +118,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it can add a hostname in an existing docker stack fenced block()
+    public function it_can_add_a_hostname_in_an_existing_docker_stack_fenced_block()
     {
         $actualContent = implode("\n",
             [
@@ -153,7 +153,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when trying to add a domain name that already exist()
+    public function it_throw_an_exception_when_trying_to_add_a_domain_name_that_already_exist()
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Domain name dev.foo.fr is already associated with foo');
@@ -174,7 +174,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it can remove a hostname in an existing docker stack fenced block()
+    public function it_can_remove_a_hostname_in_an_existing_docker_stack_fenced_block()
     {
         $actualContent = implode("\n",
             [
@@ -207,7 +207,7 @@ class HostFileManagerTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when it cant extract a domaine name()
+    public function it_throw_an_exception_when_it_cant_extract_a_domaine_name()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to parse the container domain string: invalid');

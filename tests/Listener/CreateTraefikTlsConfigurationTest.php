@@ -10,8 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class CreateTraefikTlsConfigurationTest extends TestCase
 {
+
     /** @test */
-    public function it implements EventListener()
+    public function it_implements_the_event_listener_interface()
     {
         $directory = $this->prophesize(Directory::class);
         $listener = new CreateTraefikTlsConfiguration($directory->reveal());
@@ -20,7 +21,7 @@ class CreateTraefikTlsConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function it subscribe to the SignedCertificateCreated event()
+    public function it_subscribe_to_the_signed_certificate_created_event()
     {
         $directory = $this->prophesize(Directory::class);
         $listener = new CreateTraefikTlsConfiguration($directory->reveal());
@@ -34,7 +35,7 @@ class CreateTraefikTlsConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function it create a tls configuration for traefik when a certificate has been created()
+    public function it_create_a_tls_configuration_for_traefik_when_a_certificate_has_been_created()
     {
         $expectedTlsConfig = <<<TOML
 [[tls]]

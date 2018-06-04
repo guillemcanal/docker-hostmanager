@@ -4,10 +4,11 @@ namespace ElevenLabs\DockerHostManager\Listener;
 
 use ElevenLabs\DockerHostManager\Cert\CertificateBundle;
 use ElevenLabs\DockerHostManager\CertificateGenerator;
-use ElevenLabs\DockerHostManager\Event\DomainNamesAdded;
-use ElevenLabs\DockerHostManager\Event\DomainNamesRemoved;
+use ElevenLabs\DockerHostManager\Event\ContainerCreated;
+use ElevenLabs\DockerHostManager\Event\ContainerRemoved;
 use ElevenLabs\DockerHostManager\Event\SignedCertificateCreated;
 use ElevenLabs\DockerHostManager\Event\SignedCertificateRemoved;
+use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\File\Directory;
 use ElevenLabs\DockerHostManager\File\File;
 use PHPUnit\Framework\TestCase;
@@ -18,16 +19,25 @@ use X509\Certificate\Certificate;
 class DeleteSignedCertificateTest extends TestCase
 {
     /** @test */
-    public function it subscribe to the DomainNamesRemoved event()
+    public function it_implements_the_event_listener_interface()
     {
         $directory = $this->prophesize(Directory::class);
         $listener = new DeleteSignedCertificate($directory->reveal());
 
-        assertTrue($listener->subscription()->support(new DomainNamesRemoved('', [])));
+        assertThat($listener, isInstanceOf(EventListener::class));
     }
 
     /** @test */
-    public function it should remove a signed certificate and produce a SignedCertificateDeleted event()
+    public function it_subscribe_to_the_container_removed_event()
+    {
+        $directory = $this->prophesize(Directory::class);
+        $listener = new DeleteSignedCertificate($directory->reveal());
+
+        assertTrue($listener->subscription()->support(new ContainerRemoved('', [])));
+    }
+
+    /** @test */
+    public function it_should_remove_a_signed_certificate_and_produce_a_signed_certificate_removed_event()
     {
         $directory = $this->prophesize(Directory::class);
         $directory->file('certs/test.crt')->willReturn($this->fileMock());
@@ -35,7 +45,7 @@ class DeleteSignedCertificateTest extends TestCase
 
         $listener = new DeleteSignedCertificate($directory->reveal());
 
-        $event = new DomainNamesRemoved('test', ['test.domain.fr']);
+        $event = new ContainerRemoved('test', ['test.domain.fr']);
 
         $listener->subscription()->handle($event);
 

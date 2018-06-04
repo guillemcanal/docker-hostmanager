@@ -7,7 +7,7 @@ namespace ElevenLabs\DockerHostManager\Event;
 use ElevenLabs\DockerHostManager\EventDispatcher\Event;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventType;
 
-abstract class DomainNamesEvent implements Event
+abstract class ContainerEvent implements Event
 {
     private $containerName;
     private $domainNames;

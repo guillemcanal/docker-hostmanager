@@ -17,7 +17,7 @@ use Prophecy\Argument;
 class DockerEventsTest extends TestCase
 {
     /** @test */
-    public function it produce a DockerEventReceived event when a docker event is received()
+    public function it_produce_a_DockerEventReceived_event_when_a_docker_event_is_received()
     {
         $dockerEvent = new EventsGetResponse200();
 
@@ -43,7 +43,7 @@ class DockerEventsTest extends TestCase
     }
 
     /** @test */
-    public function it produce a ContainerListReceived event when started()
+    public function it_produce_a_ContainerListReceived_event_when_started()
     {
         $containerList = [(new ContainerSummaryItem())->setNames(['/test-container'])];
 

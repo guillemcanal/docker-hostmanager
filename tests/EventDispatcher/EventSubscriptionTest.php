@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 class EventSubscriptionTest extends TestCase
 {
     /** @test */
-    public function it should call a given callback()
+    public function it_should_call_a_given_callback()
     {
         $callbackHasBeenCalled = false;
         $subscription = new EventSubscription(
@@ -23,7 +23,7 @@ class EventSubscriptionTest extends TestCase
     }
 
     /** @test */
-    public function it throw an exception when a given event classname does not exist()
+    public function it_throw_an_exception_when_a_given_event_classname_does_not_exist()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('ArrayObject does not implements ' . Event::class);

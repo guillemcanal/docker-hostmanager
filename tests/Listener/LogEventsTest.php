@@ -13,7 +13,15 @@ use Psr\Log\NullLogger;
 class LogEventsTest extends TestCase
 {
     /** @test */
-    public function it subscribe to any events()
+    public function it_implements_the_event_listener_interface()
+    {
+        $listener = new LogEvents(new NullLogger());
+
+        assertThat($listener, isInstanceOf(EventListener::class));
+    }
+
+    /** @test */
+    public function it_subscribe_to_any_events()
     {
         $event = $this->prophesize(Event::class);
         $listener = new LogEvents(new NullLogger());
@@ -23,7 +31,7 @@ class LogEventsTest extends TestCase
     }
 
     /** @test */
-    public function it can log a dispatched event()
+    public function it_can_log_a_dispatched_event()
     {
         $event = $this->prophesize(Event::class);
         $event->getName()->willReturn('test.event');

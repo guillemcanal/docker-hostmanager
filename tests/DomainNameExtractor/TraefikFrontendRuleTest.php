@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 class TraefikFrontendRuleTest extends TestCase
 {
     /** @test */
-    public function it should extract domain names from a traefik frontend rule label()
+    public function it_should_extract_domain_names_from_a_traefik_frontend_rule_label()
     {
         $containerAttributes = ['traefik.frontend.rule' => 'Host:dev.foo.fr,dev.bar.fr,dev.baz.fr; Path:/hello'];
 
@@ -22,7 +22,7 @@ class TraefikFrontendRuleTest extends TestCase
     }
 
     /** @test */
-    public function it does not provide domain names when the traefik frontend rule label is absent()
+    public function it_does_not_provide_domain_names_when_the_traefik_frontend_rule_label_is_absent()
     {
         $containerAttributes = [];
         $traefikFrontendRule = new TraefikFrontendRule();
@@ -31,7 +31,7 @@ class TraefikFrontendRuleTest extends TestCase
     }
 
     /** @test */
-    public function it does not provide domain names when the traefik frontend rule does not contains an host rule()
+    public function it_does_not_provide_domain_names_when_the_traefik_frontend_rule_does_not_contains_an_host_rule()
     {
         $containerAttributes = ['traefik.frontend.rule' => 'HostRegexp:{subdomain:[a-z]+}.localhost; Path:/hello'];
         $traefikFrontendRule = new TraefikFrontendRule();
@@ -40,7 +40,7 @@ class TraefikFrontendRuleTest extends TestCase
     }
 
     /** @test */
-    public function it does not provide domain names when the traefik frontend rule is invalid()
+    public function it_does_not_provide_domain_names_when_the_traefik_frontend_rule_is_invalid()
     {
         $containerAttributes = ['traefik.frontend.rule' => 'invalid'];
         $traefikFrontendRule = new TraefikFrontendRule();

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 class EventDispatcherTest extends TestCase
 {
     /** @test */
-    public function it can dispatch an event to an event listener()
+    public function it_can_dispatch_an_event_to_an_event_listener()
     {
         $handledEvent = false;
         $subscription = new EventSubscription(
@@ -27,7 +27,7 @@ class EventDispatcherTest extends TestCase
     }
 
     /** @test */
-    public function it only dispatch object()
+    public function it_only_dispatch_object()
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('The given event should be an object. Got string');
@@ -37,7 +37,7 @@ class EventDispatcherTest extends TestCase
     }
 
     /** @test */
-    public function it does not dispatch an event is no listener subscribed to it()
+    public function it_does_not_dispatch_an_event_is_no_listener_subscribed_to_it()
     {
         $handledEvent = null;
         $subscription = new EventSubscription(
@@ -57,7 +57,7 @@ class EventDispatcherTest extends TestCase
     }
 
     /** @test */
-    public function it collect and dispatch events from event producers()
+    public function it_collect_and_dispatch_events_from_event_producers()
     {
         $producedEvent =new DummyEventBar();
 
