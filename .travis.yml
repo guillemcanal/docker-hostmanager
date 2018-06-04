@@ -9,7 +9,7 @@ addons:
 
 jobs:
   include:
-  - stage: test
+  - stage: 'Unit tests'
     install:
     - composer install
     before_install:
@@ -21,15 +21,8 @@ jobs:
     - bash <(curl -s https://codecov.io/bash) -f build/phpunit.coverage.xml
     - sonar-scanner
 
-  - stage: docker-image:tagged
-    if: tag IS present
-    services:
-    - docker
-    script: bash ./scripts/docker-push.sh $TRAVIS_TAG
-
-  - stage: docker-image:latest
+  - stage: 'Docker image'
     if: branch = master
     services:
     - docker
-    script: bash ./scripts/docker-push.sh latest
-
+    script: bash ./scripts/docker-push.sh
