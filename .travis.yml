@@ -7,16 +7,29 @@ addons:
   sonarcloud:
     organization: "guillemcanal-github"
 
-before_install:
-  - phpenv config-rm xdebug.ini
+jobs:
+  include:
+  - stage: test
+    install:
+    - composer install
+    before_install:
+    - phpenv config-rm xdebug.ini
+    script:
+    - composer lint
+    - composer test-ci
+    after_success:
+    - bash <(curl -s https://codecov.io/bash) -f build/phpunit.coverage.xml
+    - sonar-scanner
 
-install:
-  - composer install
+  - stage: docker-image:tagged
+    if: tag IS present
+    services:
+    - docker
+    script: bash ./scripts/docker-push.sh $TRAVIS_TAG
 
-script:
-  - composer lint
-  - composer test-ci
+  - stage: docker-image:latest
+    if: branch = master
+    services:
+    - docker
+    script: bash ./scripts/docker-push.sh latest
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash) -f build/phpunit.coverage.xml
-  - sonar-scanner
