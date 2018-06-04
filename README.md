@@ -53,7 +53,7 @@ in your browsers and in your trusted root certification authorities.
 docker cp docker-hostmanager:/data/root-ca.crt .
 ```
 
-**Note**: if you are using **Firefox**, you will need to add your certificate using following that method :
+**Note**: if you are using **Firefox**, you will need to add your certificate using the following method :
 
 1. Open `Preferences`
 2. On the top right corner, search: `certificates`
@@ -61,6 +61,8 @@ docker cp docker-hostmanager:/data/root-ca.crt .
 4. Click on the `Authorities` tab
 5. Click on `Import...`
 6. Add your `root-ca.crt`
+7. Tick the box `Trust this CA to identify websites.`
+8. Click on `Ok`
 
 ### Linux (Ubuntu, Debian)
 
