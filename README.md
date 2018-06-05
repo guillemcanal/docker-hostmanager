@@ -1,4 +1,4 @@
-# [WIP] Docker HostManager
+# Docker HostManager
 
 [![Build Status](https://travis-ci.org/guillemcanal/docker-hostmanager.svg?branch=master)](https://travis-ci.org/guillemcanal/docker-hostmanager)
 [![codecov](https://codecov.io/gh/guillemcanal/docker-hostmanager/branch/master/graph/badge.svg)](https://codecov.io/gh/guillemcanal/docker-hostmanager)
