@@ -20,9 +20,3 @@ jobs:
     after_success:
     - bash <(curl -s https://codecov.io/bash) -f build/phpunit.coverage.xml
     - sonar-scanner
-
-  - stage: 'Docker image'
-    if: branch = master OR tag IS present
-    services:
-    - docker
-    script: bash ./scripts/docker-push.sh
