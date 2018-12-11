@@ -13,7 +13,7 @@ use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
 
 class CreateTraefikNetwork implements EventListener
 {
-    private const TRAEFIK_NETWORK_NAME = 'traefik';
+    public const TRAEFIK_NETWORK_NAME = 'traefik';
 
     private $docker;
 

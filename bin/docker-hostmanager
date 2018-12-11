@@ -48,17 +48,19 @@ $dockerClient = Docker::create();
 
 $eventDispatcher = new EventDispatcher\EventDispatcher(
     new Listener\LogEvents($logger),
-    new Listener\CleanTheHostsFile($hostsFileManager, new DomainNameExtractor\TraefikFrontendRule()),
+    new Listener\CleanTheHostsFile($hostsFileManager, $traefikExtractor = new DomainNameExtractor\TraefikFrontendRule()),
     new Listener\CreateTraefikNetwork($dockerClient),
     new Listener\EnsureThatTraefikIsRunning($dockerClient, $dataDirectory),
-    new Listener\ExtractDomainNames(new DomainNameExtractor\TraefikFrontendRule()),
+    new Listener\ExtractDomainNames($traefikExtractor),
     new Listener\AddDomainNames($hostsFileManager),
     new Listener\RemoveDomainNames($hostsFileManager),
     new Listener\AttachContainerToTraefikNetwork($dockerClient),
     new Listener\CreateSignedCertificate($certificateGenerator, $dataDirectory),
     new Listener\DeleteSignedCertificate($dataDirectory),
     new Listener\CreateTraefikTlsConfiguration($dataDirectory),
-    new Listener\RemoveTraefikTlsConfiguration($dataDirectory)
+    new Listener\RemoveTraefikTlsConfiguration($dataDirectory),
+    new Listener\AddDomainAliasesToTraefikNetwork($dockerClient, $traefikExtractor),
+    new Listener\AddRootCertificateInContainer($dockerClient)
 );
 
 // Start listening to docker events
