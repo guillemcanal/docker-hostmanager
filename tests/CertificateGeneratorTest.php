@@ -16,7 +16,7 @@ class CertificateGeneratorTest extends TestCase
     private $subject;
     private $rsaKeyGenerator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->rsaKeyGenerator = new RsaKeyGenerator();
 

@@ -40,6 +40,14 @@ class LocalFile implements File
     /**
      * {@inheritdoc}
      */
+    public function writable(): bool
+    {
+        return \is_writable($this->filename);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function read(): string
     {
         if (!$this->exists()) {
