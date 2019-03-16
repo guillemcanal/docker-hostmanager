@@ -85,13 +85,52 @@ certutil -addstore -f "ROOT" root-ca.crt
 
 ## Usage example
 
+
+### Using the Docker CLI
+
 ```shell
 docker run --rm -t \
 --label 'traefik.enable=true' \
 --label 'traefik.port=80' \
---label 'traefik.backend=demo' \
 --label 'traefik.frontend.rule=Host: nginx.docker' \
 nginx:alpine
 ```
 
 Head to <http://nginx.docker> or <https://nginx.docker>
+
+
+### Using Docker Compose
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  foo:
+    image: 'containous/whoami'
+    networks: ['traefik']
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.port=80'
+    - 'traefik.frontend.rule=Host: dev.demo.fr'
+networks:
+  traefik:
+    external: true
+```
+
+Head to <http://dev.demo.fr> or <https://dev.demo.fr>
+
+> **Note**: Declaring the `traefik` external network is not mandatory.  
+Without it, Docker HostManager will attach the traefik network to each containers having traefik labels.  
+Doing so, **it will restart the Traefik instance**. The `docker-composer.yml` below is perflectly fine as well:
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  foo:
+    image: 'containous/whoami'
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.port=80'
+    - 'traefik.frontend.rule=Host: dev.demo.fr'
+```
