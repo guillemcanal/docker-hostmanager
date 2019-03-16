@@ -38,6 +38,10 @@ class AttachContainerToTraefikNetwork implements EventListener
                 'traefik',
                 (new NetworksIdConnectPostBody())->setContainer($containerName)
             );
+            try {
+                $this->docker->containerRestart(EnsureThatTraefikIsRunning::TRAEFIK_CONTAINER_NAME);
+            } catch (\Exception $e) {
+            }
         }
     }
 

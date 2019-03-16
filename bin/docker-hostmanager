@@ -1,7 +1,5 @@
 #!/usr/bin/env php
 <?php
-//@todo Create a proper Symfony command
-//@todo Handle POSIX signals
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use Docker\Docker;
@@ -24,6 +22,7 @@ if (!$dockerSocketFile->exists()) {
     exit(2);
 }
 
+
 $rsaGenerator = new Crypto\RsaKeyGenerator();
 
 $subject = new Cert\Subject(
@@ -38,11 +37,8 @@ $dataDirectory = File\LocalDirectory::get(\getenv('DATA_PATH') ?: '/data');
 $issuerBundleCertificate = (new DockerHostManager\RootCertificate($dataDirectory, $rsaGenerator, $subject))->get();
 $certificateGenerator = new DockerHostManager\CertificateGenerator($subject, $rsaGenerator, $issuerBundleCertificate);
 
-$hostsFileManager = new DockerHostManager\HostsFileManager(
-    File\LocalFile::get(
-        \getenv('APP_HOSTS_PATH') ?: '/host/etc/hosts'
-    )
-);
+$hostsFile = File\LocalFile::get(\getenv('APP_HOSTS_PATH') ?: '/host/etc/hosts');
+$hostsFileManager = new DockerHostManager\HostsFileManager($hostsFile);
 
 $dockerClient = Docker::create();
 
@@ -63,5 +59,16 @@ $eventDispatcher = new EventDispatcher\EventDispatcher(
     new Listener\AddRootCertificateInContainer($dockerClient)
 );
 
-// Start listening to docker events
+$signalHandler = function ($sigNo) use($dockerClient, $logger) {
+    $logger->alert('received '.$sigNo.' signal');
+    $dockerClient->containerStop(Listener\EnsureThatTraefikIsRunning::TRAEFIK_CONTAINER_NAME);
+    exit(0);
+};
+
+// Handle signals
+pcntl_async_signals(true);
+pcntl_signal(\SIGTERM, $signalHandler);
+pcntl_signal(\SIGINT,  $signalHandler);
+
+// Start listening to Docker Events
 (new DockerHostManager\DockerEvents($dockerClient, $eventDispatcher))->listen();

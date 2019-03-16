@@ -23,4 +23,7 @@ RUN echo 'date.timezone = "UTC"' > /usr/local/etc/php/php.ini \
 
 COPY --from=builder /app /app
 
+RUN apk add --no-cache tini
+ENTRYPOINT ["/sbin/tini", "--"]
+
 CMD ["/app/bin/docker-hostmanager"]

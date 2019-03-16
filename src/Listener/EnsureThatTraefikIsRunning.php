@@ -82,6 +82,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                 )
             )
             ->setHostConfig((new HostConfig())
+                ->setAutoRemove(true)
                 ->setPortBindings(
                     new \ArrayObject(
                         [
