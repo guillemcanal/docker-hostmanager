@@ -14,6 +14,7 @@
         ]
     },
     "require": {
+        "php": ">=7.3",
         "ext-intl": "*",
         "ext-gmp": "*",
         "ext-pcntl": "*",
