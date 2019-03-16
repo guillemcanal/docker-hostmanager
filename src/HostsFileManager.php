@@ -27,7 +27,14 @@ class HostsFileManager
         $this->hostsFile = $hostsFile;
         $this->ipv4 = $ipv4;
         if (!$this->hostsFile->exists()) {
-            throw new \UnexpectedValueException('The hosts file could not be found');
+            throw new \UnexpectedValueException(
+                sprintf('could not find hosts file at "%s"', $this->hostsFile->path())
+            );
+        }
+        if (!$this->hostsFile->writable()) {
+            throw new \UnexpectedValueException(
+                sprintf('hosts file "%s" should be writable', $this->hostsFile->path())
+            );
         }
         if (!$this->hasDockerStackFencedBlock()) {
             $this->addDockerStackFencedBlock();
