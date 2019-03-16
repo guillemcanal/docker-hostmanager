@@ -12,7 +12,7 @@ class HostFileManagerTest extends TestCase
 {
     private $rootDirectory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->rootDirectory = vfsStream::setup('etc');
     }

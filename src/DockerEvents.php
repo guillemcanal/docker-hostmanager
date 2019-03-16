@@ -21,6 +21,8 @@ class DockerEvents
     /** @var EventDispatcher */
     private $dispatcher;
 
+    private $events;
+
     public function __construct(Docker $docker, EventDispatcher $dispatcher)
     {
         $this->docker = $docker;
@@ -31,16 +33,21 @@ class DockerEvents
     {
         $this->applicationStarted();
         $this->listContainerNames();
-        /** @var EventStream $events */
-        $events = $this->docker->systemEvents();
-        $events->onFrame(
+        /* @var EventStream $events */
+        $this->events = $this->docker->systemEvents();
+        $this->events->onFrame(
             function ($event): void {
                 if (\is_object($event) && $event instanceof EventsGetResponse200) {
                     $this->dispatcher->dispatch(new DockerEventReceived($event));
                 }
             }
         );
-        $events->wait();
+        $this->events->wait();
+    }
+
+    public function close(): void
+    {
+        $this->events->closeAndRead();
     }
 
     private function listContainerNames(): void

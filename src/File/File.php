@@ -26,6 +26,13 @@ interface File
     public function exists(): bool;
 
     /**
+     * Check if a file is writable.
+     *
+     * @return bool Either if a file exist or not
+     */
+    public function writable(): bool;
+
+    /**
      * Read the content of a file.
      *
      * @throws FileDoesNotExist When the file does not exists

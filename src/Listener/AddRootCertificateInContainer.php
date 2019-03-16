@@ -7,15 +7,15 @@ namespace ElevenLabs\DockerHostManager\Listener;
 use Docker\API\Model\ContainersIdExecPostBody;
 use Docker\API\Model\ExecIdStartPostBody;
 use Docker\API\Model\IdResponse;
+use Docker\Docker;
 use Docker\Stream\DockerRawStream;
 use ElevenLabs\DockerHostManager\Event\ContainerCreated;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventListener;
 use ElevenLabs\DockerHostManager\EventDispatcher\EventSubscription;
-use Docker\Docker;
 
 class AddRootCertificateInContainer implements EventListener
 {
-    /** @var Docker  */
+    /** @var Docker */
     private $docker;
     /** @var string */
     private $rootCa;
@@ -29,7 +29,7 @@ class AddRootCertificateInContainer implements EventListener
     {
         return new EventSubscription(
             ContainerCreated::class,
-            function (ContainerCreated $event) {
+            function (ContainerCreated $event): void {
                 $this->addRootCertificate($event);
             }
         );
@@ -37,13 +37,13 @@ class AddRootCertificateInContainer implements EventListener
 
     public function addRootCertificate(ContainerCreated $event): void
     {
-        /** @TODO load RootCA contents somewhere else */
+        /* @TODO load RootCA contents somewhere else */
         if (!$this->rootCa) {
             $rootCaFile = '/data/root-ca.crt';
-            if (!file_exists($rootCaFile)) {
+            if (!\file_exists($rootCaFile)) {
                 return;
             }
-            $this->rootCa = file_get_contents($rootCaFile);
+            $this->rootCa = \file_get_contents($rootCaFile);
         }
 
         $caCertificatesDir = '/usr/local/share/ca-certificates';
@@ -55,18 +55,18 @@ class AddRootCertificateInContainer implements EventListener
                 ->setCmd(
                     [
                         'sh', '-c',
-                        implode(PHP_EOL, [
-                            'mkdir -p ' . $caCertificatesDir,
-                            'cat << EOF > ' . $caCertificatesDir . '/root-ca.crt',
+                        \implode(PHP_EOL, [
+                            'mkdir -p '.$caCertificatesDir,
+                            'cat << EOF > '.$caCertificatesDir.'/root-ca.crt',
                             $this->rootCa,
                             'EOF',
-                            'update-ca-certificates --fresh || true'
-                        ])
+                            'update-ca-certificates --fresh || true',
+                        ]),
                     ]
                 )
         );
 
-        /** @var DockerRawStream $stream */
+        /* @var DockerRawStream $stream */
         $this->docker->execStart(
             $execIdResponse->getId(),
             (new ExecIdStartPostBody())

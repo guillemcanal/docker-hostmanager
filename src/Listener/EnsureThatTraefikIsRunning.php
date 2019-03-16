@@ -29,8 +29,8 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
 
     public const TRAEFIK_CONTAINER_NAME = 'docker-hostmanager-traefik';
     public const TRAEFIK_CONF_DIRECTORY = 'traefik';
-    public const TRAEFIK_VERSION        = 'v1.7.5';
-    public const TRAEFIK_DOMAIN_NAME    = 'traefik.docker';
+    public const TRAEFIK_VERSION = 'v1.7.9';
+    public const TRAEFIK_DOMAIN_NAME = 'traefik.docker';
 
     private $docker;
     private $directory;
@@ -65,27 +65,28 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
             ->setExposedPorts(
                 new \ArrayObject(
                     [
-                        '80/tcp'   => new \ArrayObject(),
+                        '80/tcp' => new \ArrayObject(),
                         '8080/tcp' => new \ArrayObject(),
-                        '443/tcp'  => new \ArrayObject(),
+                        '443/tcp' => new \ArrayObject(),
                     ]
                 )
             )
             ->setLabels(
                 new \ArrayObject(
                     [
-                        'traefik.enable'        => 'true',
-                        'traefik.backend'       => 'traefik',
-                        'traefik.port'          => '8080',
+                        'traefik.enable' => 'true',
+                        'traefik.backend' => 'traefik',
+                        'traefik.port' => '8080',
                         'traefik.frontend.rule' => 'Host: '.self::TRAEFIK_DOMAIN_NAME,
                     ]
                 )
             )
             ->setHostConfig((new HostConfig())
+                ->setAutoRemove(true)
                 ->setPortBindings(
                     new \ArrayObject(
                         [
-                            '80/tcp'  => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('80')],
+                            '80/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('80')],
                             '443/tcp' => [(new PortBinding())->setHostIp('0.0.0.0')->setHostPort('443')],
                         ]
                     )

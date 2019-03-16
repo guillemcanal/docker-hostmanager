@@ -34,7 +34,7 @@ class AddDomainAliasesToTraefikNetwork implements EventListener, EventProducer
     {
         return new EventSubscription(
             ContainerEvent::class,
-            function () {
+            function (): void {
                 $this->addDomainAliasesToTraefik();
             }
         );
@@ -46,7 +46,7 @@ class AddDomainAliasesToTraefikNetwork implements EventListener, EventProducer
 
         if (
             ($this->previousDomainAliases === [] && !empty($domainAliases)) ||
-            array_diff($domainAliases, $this->previousDomainAliases) !== []
+            \array_diff($domainAliases, $this->previousDomainAliases) !== []
         ) {
             $this->docker->networkDisconnect(
                 CreateTraefikNetwork::TRAEFIK_NETWORK_NAME,
@@ -63,9 +63,9 @@ class AddDomainAliasesToTraefikNetwork implements EventListener, EventProducer
 
             $this->produceEvent(
                 new EventProcessed(
-                    sprintf(
+                    \sprintf(
                         'added aliases %s to the traefik network',
-                        implode(', ', $domainAliases)
+                        \implode(', ', $domainAliases)
                     )
                 )
             );
@@ -78,10 +78,10 @@ class AddDomainAliasesToTraefikNetwork implements EventListener, EventProducer
         foreach ($this->docker->containerList() as $item) {
             $containerLabels = ($item->getLabels() ?: new \ArrayObject())->getArrayCopy();
             if ($this->domainExtractor->provideDomainNames($containerLabels)) {
-                array_push($domains, ...$this->domainExtractor->getDomainNames($containerLabels));
+                \array_push($domains, ...$this->domainExtractor->getDomainNames($containerLabels));
             }
         }
 
-        return array_unique($domains);
+        return \array_unique($domains);
     }
 }
