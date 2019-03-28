@@ -111,7 +111,7 @@ class EnsureThatTraefikIsRunning implements EventListener, EventProducer
                     '--docker.watch=true',
                     '--docker.exposedByDefault=false',
                     '--docker.network='.CreateTraefikNetwork::TRAEFIK_NETWORK_NAME,
-                    '--logLevel=INFO',
+                    '--logLevel='.\getenv('TRAEFIK_LOG_LEVEL') ?: 'INFO',
                 ]
             );
 
